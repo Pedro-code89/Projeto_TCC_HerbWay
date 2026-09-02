@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>HerbWay</title>
+
+    <link rel="stylesheet" href="../Public/style.css">
+    <link rel="shortcut icon" href="../images/plant-pot.svg">
+
+    <script src="../Scripts/index.js" defer></script>
+</head>
+
+<body>
+
+    <header>
+
+        <div class="logo-area">
+
+            <div class="logo_img">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    fill="currentColor"
+                    viewBox="0 0 24 24">
+
+                    <path d="m3,13h18c.55,0,1-.45,1-1v-2c0-.55-.45-1-1-1h-8v-2.39c.78-.1,1.77-.36,2.53-1.02,1.46-1.28,1.47-3.57,1.47-3.57,0,0-2.35-.21-3.81,1.07-.79.69-1.15,1.67-1.32,2.43-.12-.57-.36-1.24-.87-1.74-1.1-1.06-3-.94-3-.94,0,0-.12,1.85.97,2.91.58.57,1.39.79,2.02.89v2.38H3c-.55,0-1,.45-1,1v2c0,.55.45,1,1,1Z"/>
+
+                    <path d="m4.04,14.27l2,7c.12.43.52.73.96.73h10c.45,0,.84-.3.96-.73l2-7c.03-.09.01-.18.01-.27H4.03c0,.09-.01.18-.01.27Z"/>
+
+                </svg>
+            </div>
+
+            <div class="logo">
+                HerbWay
+            </div>
+
+        </div>
+
+        <div class="botoes-header">
+            <a href="login.html" class="btn-entrar">
+                Entrar
+            </a>
+
+            <a href="cadastro.html" class="btn-cadastro">
+                Criar conta
+            </a>
+        </div>
+
+    </header>
+
+    <main>
+
+        <section class="conteudo-inicial">
+
+            <div class="introducao">
+
+                <div class="titulo-localizacao">
+
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        width="36"
+                        height="36"
+                        fill="#1b4d3e"
+                        viewBox="0 0 24 24"
+                        class="icon-plant">
+
+                        <path d="M3 13h18c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1h-8V6.61c.78-.1 1.77-.36 2.53-1.02C16.99 4.31 17 2.02 17 2.02s-2.35-.21-3.81 1.07c-.79.69-1.15 1.67-1.32 2.43-.12-.57-.36-1.24-.87-1.74-1.1-1.06-3-.94-3-.94s-.12 1.85.97 2.91c.58.57 1.39.79 2.02.89v2.38H3c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1Zm1.04 1.27 2 7c.12.43.52.73.96.73h10c.45 0 .84-.3.96-.73l2-7c.03-.09.01-.18.01-.27H4.03c0 .09-.01.18.01.27Z">
+                        </path>
+
+                    </svg>
+
+                    <span class="pequeno-titulo">
+                        JARDINAGEM PERTO DE VOCÊ
+                    </span>
+
+                </div>
+
+                <h1>
+                    Encontre o jardineiro ideal
+                    <br>
+                    para cuidar do seu espaço
+                </h1>
+
+                <p class="descricao">
+                    Conheça profissionais, veja serviços, portfólios 
+                    e avaliações e entre em contato diretamente.
+                </p>
+
+            <div class="pesquisa">
+
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                    class="icon-search">
+
+                <path d="M18 10c0-4.41-3.59-8-8-8s-8 3.59-8 8 3.59 8 8 8c1.85 0 3.54-.63 4.9-1.69l5.1 5.1L21.41 20l-5.1-5.1A8 8 0 0 0 18 10M4 10c0-3.31 2.69-6 6-6s6 2.69 6 6-2.69 6-6 6-6-2.69-6-6"></path>
+
+                </svg>
+
+            <input
+                type="text"
+                placeholder="Pesquise por nome, serviço ou localização..."
+            >
+
+            </div>
+
+            </div>
+
+            <div class="form-wrapper">
+
+                <span class="tag">
+                    ACESSE SUA CONTA
+                </span>
+
+                <h2>
+                    Entrar na HerbWay
+                </h2>
+
+                <p class="subtitle">
+                    Entre para gerenciar anúncios ou avaliar profissionais.
+                </p>
+
+
+                <form action="#" method="post" novalidate>
+
+                    <div class="form-group">
+
+                        <label for="email">
+                            E-mail
+                        </label>
+
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="seuemail@exemplo.com"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="senha">
+                            Senha
+                        </label>
+
+                        <input
+                            type="password"
+                            id="senha"
+                            name="senha"
+                            placeholder="Digite sua senha"
+                            required
+                        >
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        class="btn-log btn-full">
+                        Entrar
+                    </button>
+
+                </form>
+
+
+                <p class="form-footer">
+                    Ainda não possui uma conta?
+                    <a href="cadastro.html">
+                        Cadastre-se
+                    </a>
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>
