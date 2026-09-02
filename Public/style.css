@@ -48,7 +48,7 @@ body {
 .botoes-header {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 1.5rem;
 }
 
 .botoes-header a {
@@ -80,22 +80,23 @@ body {
 }
 
 main {
-    width: 90%;
+    width: 100%;
     max-width: 1200px;
     margin: auto;
+    padding: 0.7rem;
 }
 
 .conteudo-inicial {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 70px;
-    margin-top: 55px;
+    gap: 40px;
+    margin-top: 40px;
 }
 
 .introducao {
     flex: 1;
-    max-width: 700px;
+    max-width: 1100px;
 }
 
 .titulo-localizacao {
@@ -134,7 +135,22 @@ main {
     color: #666;
     font-size: 16px;
     line-height: 1.5;
-    max-width: 600px;
+    max-width: 800px;
+}
+
+.plant-div {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.plant-img {
+    width: 300px; 
+    height: auto;
+    object-fit: contain;
+    
 }
 
 .pesquisa {
@@ -149,6 +165,72 @@ main {
     box-shadow: 0 2px 8px #00000010;
 }
 
+.filtros-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: 1.2rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.filtros-selects {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.select-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 0 14px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.icon-select {
+    color: #666;
+    margin-right: 8px;
+    pointer-events: none;
+}
+
+.select-wrapper select {
+    appearance: none;
+    -webkit-appearance: none;
+    border: none;
+    background: transparent;
+    padding: 12px 28px 12px 0;
+    font-size: 14px;
+    color: #444;
+    cursor: pointer;
+    outline: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right center;
+    background-size: 14px;
+}
+
+.btn-limpar-filtros {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #e5e9e2;
+    color: #555;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-weight: 600;
+}
+
+.btn-limpar-filtros:hover {
+    background-color: rgba(208, 25, 25, 0.74);
+    color: #fff;
+}
 
 .icon-search {
     width: 24px;
@@ -324,4 +406,208 @@ main {
         padding: 2rem;
     }
 
+}
+
+/* Subtítulo da Lista */
+.header-resultados {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 3rem;
+    margin-bottom: 2.5rem;
+    margin-left: 1rem;
+}
+
+.header-resultados h2 {
+    font-size: 1.7rem;
+    color: #222;
+    font-weight: bold;
+}
+
+.total-resultados {
+    font-size: 13px;
+    color: #777;
+}
+
+/* Grid onde os cards vão ficar dispostos */
+.grid-jardineiros {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+/* Estrutura do Card */
+.card-jardineiro {
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+.card-topo {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+/* Espaço cinza enquanto não tem foto */
+.foto-placeholder {
+    width: 85px;
+    height: 85px;
+    border-radius: 12px;
+    background-color: #e2e8f0;
+    flex-shrink: 0;
+}
+
+.info-jardineiro h3 {
+    font-size: 20px;
+    color: #000;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.info-jardineiro .avaliacao {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 6px;
+}
+
+.info-jardineiro .avaliacao span {
+    font-weight: normal;
+    color: #666;
+}
+
+.info-jardineiro .localizacao {
+    font-size: 13px;
+    color: #444;
+}
+
+/* Tags verdes de serviço */
+.tags-servicos {
+    display: flex;
+    gap: 8px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.tag {
+    background-color: #dbebe2;
+    color: #1b4d3e;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 6px;
+}
+
+/* Linha divisória fina */
+.divisor-card {
+    height: 1px;
+    background-color: #222222;
+    margin-bottom: 15px;
+}
+
+/* Preço e Botão */
+.card-rodape {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.card-rodape .preco {
+    font-size: 15px;
+    color: #222;
+    align-self: flex-start;
+}
+
+.card-rodape .preco strong {
+    color: #1b4d3e;
+    font-size: 17px;
+}
+
+.btn-perfil {
+    width: 60%;
+    background-color: #2bb673;
+    color: #ffffff;
+    border: none;
+    padding: 10px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-perfil:hover {
+    background-color: #23985f;
+}
+
+/* Estrutura do Carrossel */
+.carrossel-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.carrossel-container {
+    display: flex; /* Muda de grid para flex suave em linha */
+    gap: 20px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding: 10px 5px;
+    scrollbar-width: none; /* Esconde barra de rolagem no Firefox */
+}
+
+.carrossel-container::-webkit-scrollbar {
+    display: none; /* Esconde barra de rolagem no Chrome/Safari/Edge */
+}
+
+/* Fixa o tamanho mínimo do card para não encolher na rolagem */
+.card-jardineiro {
+    flex: 0 0 340px;
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Botões de Setas */
+.btn-carrossel {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 42px;
+    height: 42px;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    z-index: 5;
+    color: #1b4d3e;
+    transition: all 0.2s;
+}
+
+.btn-carrossel:hover {
+    background-color: #1b4d3e;
+    color: #ffffff;
+    border-color: #1b4d3e;
+}
+
+.btn-prev {
+    left: -20px;
+}
+
+.btn-next {
+    right: -20px;
 }
