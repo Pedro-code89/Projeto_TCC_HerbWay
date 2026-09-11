@@ -4,7 +4,6 @@ const path = require('path');
 
 // Importando as rotas
 const homeRoutes = require('./src/Routes/homeRoutes');
-const jardineiroRoutes = require('./src/Routes/jardineiroRoutes');
 const usuarioRoutes = require('./src/Routes/usuarioRoutes');
 
 // Servidor
@@ -23,7 +22,6 @@ app.use(express.urlencoded({ extended: true }));
 
 // Rotas
 app.use(homeRoutes);
-//app.use(jardineiroRoutes);
 app.use(usuarioRoutes);
 
 // Iniciando o servidor
