@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entrar - HerbWay</title>
+  <link rel="shortcut icon" href="/images/plant-pot.svg">
+  <link rel="stylesheet" href="/css/login.css">
+  <script src="/js/login.js" defer></script>
+</head>
+<body>
+
+  <header>
+    <div class="logo">HerbWay</div>
+    <nav>
+      <a href="/" class="btn-home">Início</a>
+      <a href="/cadastro" class="btn-primary">Criar conta</a>
+    </nav>
+  </header>
+
+  <div class="form-wrapper">
+    <span class="tag">ACESSE SUA CONTA</span>
+    <h2>Entrar na HerbWay</h2>
+    <p class="subtitle">Entre para gerenciar anúncios ou avaliar profissionais.</p>
+
+    <form action="/login" method="post">
+      <div class="form-group">
+        <label for="email">E-mail</label>
+        <input type="email" id="email" name="email" placeholder="seuemail@exemplo.com" required>
+      </div>
+
+      <div class="form-group">
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" name="senha" placeholder="Digite sua senha" required>
+      </div>
+
+      <button type="submit" class="btn-primary btn-full">Entrar</button>
+    </form>
+
+    <p class="form-footer">Ainda não possui uma conta? <a href="/cadastro">Cadastre-se</a></p>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "name": "projeto_tcc_herbway",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Pedro-code89/Projeto_TCC_HerbWay.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Pedro-code89/Projeto_TCC_HerbWay/issues"
+  },
+  "homepage": "https://github.com/Pedro-code89/Projeto_TCC_HerbWay#readme",
+  "description": "",
+  "dependencies": {
+    "ejs": "^6.0.1",
+    "express": "^5.2.1"
+  }
+}
