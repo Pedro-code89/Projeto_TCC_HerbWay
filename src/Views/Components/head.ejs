@@ -1,0 +1,26 @@
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#194e40">
+  <script>
+    // Aplica o tema salvo (ou o do sistema) antes do primeiro render, sem "pisca".
+    try {
+      var temaSalvo = localStorage.getItem('herbway-tema');
+      var temaEscuro = temaSalvo ? temaSalvo === 'escuro' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.dataset.tema = temaEscuro ? 'escuro' : 'claro';
+    } catch (erro) { document.documentElement.dataset.tema = 'claro'; }
+  </script>
+  <title>
+    <%= titulo %> | HerbWay
+  </title>
+  <link rel="icon" href="/images/plant-pot.svg">
+  <link rel="stylesheet" href="/css/base.css">
+  <% estilos.forEach(arquivo=> { %>
+    <link rel="stylesheet" href="/css/<%= arquivo %>">
+    <% }); %>
+      <script src="/js/dados.js" defer></script>
+      <script src="/js/app.js" defer></script>
+      <% scripts.forEach(arquivo=> { %>
+        <script src="/js/<%= arquivo %>" defer></script>
+        <% }); %>
+</head>

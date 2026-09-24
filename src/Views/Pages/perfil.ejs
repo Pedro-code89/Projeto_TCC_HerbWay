@@ -1,0 +1,322 @@
+<% const idPerfil=typeof perfilId==='string' ? perfilId : '' ; %>
+  <!DOCTYPE html>
+  <html lang="pt-BR">
+  <%- include('../Components/head', { titulo: idPerfil ? 'Perfil' : 'Meu perfil' , estilos: ['perfil.css'], scripts:
+    ['perfil.js'] }) %>
+
+    <body data-perfil-id="<%= idPerfil %>">
+      <%- include('../Components/cabecalho') %>
+        <main class="container principal" id="conteudo" <%- !idPerfil ? 'data-requer-conta' : '' %>>
+          <div class="titulo-perfil">
+            <div>
+              <h1 id="titulo-pagina">
+                <%= idPerfil ? 'Perfil' : 'Meu perfil' %>
+              </h1>
+              <p class="texto-cinza" data-proprio hidden>Seus dados e serviços, em um só lugar.</p>
+            </div>
+            <a class="voltar-perfil" href="/servicos">Explorar serviços <span aria-hidden="true">→</span></a>
+          </div>
+
+          <p class="card perfil-indisponivel" id="perfil-inexistente" hidden>Perfil não encontrado. <a
+              class="link-verde" href="/servicos">Voltar aos serviços.</a></p>
+
+          <!-- Perfil -->
+          <section class="card perfil" id="card-perfil" aria-labelledby="nome-perfil" hidden>
+            <div class="perfil-topo">
+              <div class="identidade">
+                <div class="avatar" id="avatar" aria-hidden="true"></div>
+                <div class="identidade-texto">
+                  <span class="tipo-perfil" id="tipo-perfil"></span>
+                  <h2 id="nome-perfil"></h2>
+                  <p class="localizacao">
+                    <svg class="icone" aria-hidden="true">
+                      <use href="#icone-local"></use>
+                    </svg>
+                    <span id="local-perfil"></span>
+                  </p>
+                </div>
+              </div>
+              <button class="botao botao-contorno" id="editar-perfil" type="button" data-proprio hidden>
+                <svg class="icone" aria-hidden="true">
+                  <use href="#icone-editar"></use>
+                </svg>
+                Editar perfil
+              </button>
+            </div>
+
+            <dl class="dados-perfil" data-proprio hidden>
+              <div>
+                <dt>Nome completo</dt>
+                <dd id="dado-nome"></dd>
+              </div>
+              <div>
+                <dt>E-mail</dt>
+                <dd id="dado-email"></dd>
+              </div>
+              <div>
+                <dt>Telefone</dt>
+                <dd id="dado-telefone"></dd>
+              </div>
+              <div>
+                <dt>Cidade</dt>
+                <dd id="dado-cidade"></dd>
+              </div>
+              <div>
+                <dt>Estado</dt>
+                <dd id="dado-estado"></dd>
+              </div>
+              <div>
+                <dt>Endereço</dt>
+                <dd id="dado-bairro"></dd>
+              </div>
+              <div class="sobre-mim">
+                <dt>Sobre mim</dt>
+                <dd id="dado-sobre"></dd>
+              </div>
+            </dl>
+            <div class="sobre-publico" id="sobre-publico" hidden>
+              <h3>Sobre</h3>
+              <p id="descricao-publica"></p>
+            </div>
+          </section>
+
+          <!-- Serviços -->
+          <section class="card servicos" aria-label="Gerenciar serviços" data-proprio hidden>
+            <div class="abas" role="tablist" aria-label="Seus serviços">
+              <button class="aba ativa" id="aba-contratados" type="button" role="tab" aria-selected="true"
+                aria-controls="painel-contratados" data-painel="contratados">
+                <span>Serviços contratados</span><span class="quantidade" id="total-contratados"
+                  aria-hidden="true">0</span>
+              </button>
+              <button class="aba" id="aba-meus" type="button" role="tab" tabindex="-1" aria-selected="false"
+                aria-controls="painel-meus" data-painel="meus">
+                <span>Meus serviços</span><span class="quantidade" id="total-meus" aria-hidden="true">0</span>
+              </button>
+              <button class="aba aba-postar" id="aba-postar" type="button" role="tab" tabindex="-1"
+                aria-selected="false" aria-controls="painel-postar" data-painel="postar">
+                <svg class="icone" aria-hidden="true">
+                  <use href="#icone-mais"></use>
+                </svg><span>Postar serviço</span>
+              </button>
+            </div>
+
+            <div class="painel-servicos" id="painel-contratados" role="tabpanel" tabindex="0"
+              aria-labelledby="aba-contratados">
+              <div class="painel-titulo">
+                <h2>Seu histórico de contratações</h2>
+                <p>Confira os serviços que você contratou e acompanhe os detalhes.</p>
+              </div>
+              <table id="tabela-contratados">
+                <caption class="sr-only">Histórico dos profissionais que você contratou</caption>
+                <thead>
+                  <tr>
+                    <th>Serviço</th>
+                    <th>Profissional</th>
+                    <th>Data</th>
+                    <th>Status</th>
+                    <th><span class="sr-only">Ações</span></th>
+                  </tr>
+                </thead>
+                <tbody id="lista-contratados"></tbody>
+              </table>
+              <div class="vazio" id="contratados-vazio" hidden>
+                <svg class="icone" aria-hidden="true">
+                  <use href="#icone-planta"></use>
+                </svg>
+                <h3>Seu próximo cuidado começa aqui</h3>
+                <p>Você ainda não tem serviços contratados.</p>
+                <a class="botao botao-contorno" href="/servicos">Encontrar um serviço</a>
+              </div>
+            </div>
+
+            <div class="painel-servicos" id="painel-meus" role="tabpanel" tabindex="0" aria-labelledby="aba-meus"
+              hidden>
+              <div class="painel-titulo">
+                <h2>Serviços que você oferece</h2>
+                <p>Seus anúncios publicados aparecem no dashboard.</p>
+              </div>
+              <table id="tabela-meus" hidden>
+                <caption class="sr-only">Anúncios publicados pelo seu perfil</caption>
+                <thead>
+                  <tr>
+                    <th>Serviço</th>
+                    <th>Categoria</th>
+                    <th>Preço inicial</th>
+                    <th>Status</th>
+                    <th><span class="sr-only">Ações</span></th>
+                  </tr>
+                </thead>
+                <tbody id="lista-meus"></tbody>
+              </table>
+              <div class="vazio" id="meus-vazio">
+                <svg class="icone" aria-hidden="true">
+                  <use href="#icone-planta"></use>
+                </svg>
+                <h3>Compartilhe seu cuidado com as plantas</h3>
+                <p>Publique seu primeiro serviço usando este mesmo perfil.</p>
+                <button class="botao botao-verde" type="button" data-novo-servico>Postar meu primeiro serviço</button>
+              </div>
+            </div>
+
+            <div class="painel-servicos" id="painel-postar" role="tabpanel" tabindex="0" aria-labelledby="aba-postar"
+              hidden>
+              <%- include('../Components/formularioServico') %>
+            </div>
+          </section>
+
+          <!-- Perfil público -->
+          <section class="card servicos servicos-publicos" id="servicos-publicos" aria-labelledby="titulo-publicos"
+            hidden>
+            <div class="painel-titulo">
+              <h2 id="titulo-publicos">Serviços oferecidos</h2>
+              <p>Conheça os cuidados disponíveis neste perfil.</p>
+            </div>
+            <div id="lista-publicos" class="lista-publicos"></div>
+            <p class="texto-cinza" id="publicos-vazio" hidden>Este perfil ainda não tem serviços publicados.</p>
+          </section>
+        </main>
+
+        <!-- Editar perfil -->
+        <dialog id="modal-perfil" aria-labelledby="titulo-editar">
+          <div class="modal-topo">
+            <h2 id="titulo-editar">Editar perfil</h2>
+            <button class="botao-icone" type="button" data-fechar aria-label="Fechar edição"><svg class="icone"
+                aria-hidden="true">
+                <use href="#icone-fechar"></use>
+              </svg></button>
+          </div>
+          <form id="form-perfil" class="formulario">
+            <label class="campo-inteiro">Nome completo<input name="nome" autocomplete="name" required minlength="3"
+                maxlength="100"></label>
+            <label>E-mail<input name="email" type="email" autocomplete="email" required maxlength="120"></label>
+            <label>Telefone<input name="telefone" type="tel" autocomplete="tel" maxlength="25"
+                placeholder="(19) 99999-9999"></label>
+            <label>Cidade<input name="cidade" autocomplete="address-level2" maxlength="60"
+                placeholder="Sua cidade"></label>
+            <label>Estado<select name="estado" autocomplete="address-level1" data-estados>
+                <option value="">Selecione</option>
+              </select></label>
+            <label class="campo-inteiro">Endereço<input name="bairro" maxlength="60" placeholder="Seu bairro, Rua, Numero etc"></label>
+            <label class="campo-inteiro">Sobre mim<textarea name="sobre" rows="3" maxlength="300"
+                placeholder="Conte um pouco sobre você e sua relação com as plantas."></textarea></label>
+            <p id="erro-perfil" class="erro-form campo-inteiro" role="alert" hidden></p>
+            <div class="modal-acoes campo-inteiro">
+              <button class="botao botao-contorno" type="button" data-fechar>Cancelar</button>
+              <button class="botao botao-verde" type="submit">Salvar alterações</button>
+            </div>
+          </form>
+        </dialog>
+
+        <!-- Contratação -->
+        <dialog id="modal-detalhes" aria-labelledby="titulo-detalhes">
+          <div class="modal-topo">
+            <h2 id="titulo-detalhes">Detalhes da contratação</h2>
+            <button class="botao-icone" type="button" data-fechar aria-label="Fechar detalhes"><svg class="icone"
+                aria-hidden="true">
+                <use href="#icone-fechar"></use>
+              </svg></button>
+          </div>
+          <dl class="detalhes">
+            <div>
+              <dt>Serviço</dt>
+              <dd id="detalhe-titulo"></dd>
+            </div>
+            <div>
+              <dt>Profissional contratado</dt>
+              <dd id="detalhe-profissional"></dd>
+            </div>
+            <div>
+              <dt>Data</dt>
+              <dd id="detalhe-data"></dd>
+            </div>
+            <div>
+              <dt>Status</dt>
+              <dd id="detalhe-status"></dd>
+            </div>
+            <div>
+              <dt>Descrição</dt>
+              <dd id="detalhe-descricao"></dd>
+            </div>
+            <div id="detalhe-avaliacao" hidden>
+              <dt>Sua avaliação</dt>
+              <dd class="nota" id="detalhe-nota"></dd>
+              <dd id="detalhe-comentario" class="texto-cinza" hidden></dd>
+            </div>
+          </dl>
+          <div class="modal-acoes">
+            <button class="botao botao-contorno" id="concluir-contratacao" type="button" hidden>Marcar como
+              concluído</button>
+            <button class="botao botao-contorno" id="avaliar-contratacao" type="button" hidden>Avaliar serviço</button>
+            <button class="botao botao-verde" type="button" data-fechar>Fechar</button>
+          </div>
+        </dialog>
+
+        <!-- Avaliação do serviço -->
+        <dialog id="modal-avaliacao" aria-labelledby="titulo-avaliacao">
+          <div class="modal-topo">
+            <h2 id="titulo-avaliacao">Avaliar serviço</h2>
+            <button class="botao-icone" type="button" data-fechar aria-label="Fechar avaliação"><svg class="icone"
+                aria-hidden="true">
+                <use href="#icone-fechar"></use>
+              </svg></button>
+          </div>
+          <p class="texto-cinza" id="avaliacao-servico">Como foi o serviço que você contratou?</p>
+          <div class="seletor-nota" role="group" aria-label="Avaliação de 1 a 5 estrelas">
+            <button class="estrela" type="button" data-nota="1" aria-label="1 estrela: Insatisfeito"
+              aria-pressed="false">★</button>
+            <button class="estrela" type="button" data-nota="2" aria-label="2 estrelas: Mediano"
+              aria-pressed="false">★</button>
+            <button class="estrela" type="button" data-nota="3" aria-label="3 estrelas: Bom" aria-pressed="false">★</button>
+            <button class="estrela" type="button" data-nota="4" aria-label="4 estrelas: Muito bom"
+              aria-pressed="false">★</button>
+            <button class="estrela" type="button" data-nota="5" aria-label="5 estrelas: Excelente"
+              aria-pressed="false">★</button>
+          </div>
+          <p class="rotulo-nota" id="rotulo-nota" aria-live="polite">Escolha de 1 a 5 estrelas</p>
+          <label class="campo-comentario"><span class="texto-cinza">Comentário (opcional)</span>
+            <textarea id="comentario-avaliacao" rows="3" maxlength="500"
+              placeholder="Conte como foi o serviço..."></textarea></label>
+          <p id="erro-avaliacao" class="erro-form" role="alert" hidden></p>
+          <div class="modal-acoes">
+            <button class="botao botao-contorno" type="button" data-fechar>Cancelar</button>
+            <button class="botao botao-verde" id="salvar-avaliacao" type="button" disabled>Salvar avaliação</button>
+          </div>
+        </dialog>
+
+        <!-- Modelos -->
+        <template id="modelo-contratado">
+          <tr>
+            <td data-rotulo="Serviço" data-campo="titulo"></td>
+            <td data-rotulo="Profissional" data-campo="profissional"></td>
+            <td data-rotulo="Data" data-campo="data"></td>
+            <td data-rotulo="Status"><span class="status" data-campo="status"></span></td>
+            <td class="celula-acao"><button class="acao-texto" type="button">Detalhes <span
+                  aria-hidden="true">↗</span></button></td>
+          </tr>
+        </template>
+        <template id="modelo-meu">
+          <tr>
+            <td data-rotulo="Serviço" data-campo="titulo"></td>
+            <td data-rotulo="Categoria" data-campo="categoria"></td>
+            <td data-rotulo="Preço inicial" data-campo="preco"></td>
+            <td data-rotulo="Status"><span class="status" data-campo="status"></span></td>
+            <td class="celula-acao"><button class="acao-texto" type="button">Editar <svg class="icone"
+                  aria-hidden="true">
+                  <use href="#icone-editar"></use>
+                </svg></button></td>
+          </tr>
+        </template>
+        <template id="modelo-publico">
+          <article class="anuncio-publico">
+            <span class="tipo-perfil" data-campo="categoria"></span>
+            <h3 data-campo="titulo"></h3>
+            <p data-campo="descricao"></p>
+            <div><strong data-campo="preco"></strong><a class="botao botao-contorno" data-link-servico>Ver serviço</a>
+            </div>
+          </article>
+        </template>
+
+        <%- include('../Components/rodape') %>
+    </body>
+
+  </html>

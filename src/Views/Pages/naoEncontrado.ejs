@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<%- include('../Components/head', { titulo: 'Página não encontrada' , estilos: ['style.css'], scripts: [] }) %>
+
+    <body><%- include('../Components/cabecalho') %>
+            <main class="container pagina-detalhe" id="conteudo">
+                <div class="estado-vazio"><span class="categoria">404</span>
+                    <h1>Esta página não foi encontrada.</h1>
+                    <p>Você pode continuar explorando os serviços do HerbWay.</p><a class="botao botao-verde"
+                        href="/">Voltar ao dashboard</a>
+                </div>
+            </main><%- include('../Components/rodape') %></body>
+
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<%- include('../Components/head', { titulo: 'Dashboard' , estilos: ['style.css'], scripts: ['catalogo.js', 'index.js' ]
+  }) %>
+
+  <body><%- include('../Components/cabecalho') %>
+      <main class="container home" id="conteudo">
+        <!-- Home -->
+        <section class="conteudo-inicial">
+          <div class="introducao"><span class="pequeno-titulo">JARDINAGEM PERTO DE VOCÊ</span>
+            <h1>Encontre o jardineiro ideal para cuidar do seu espaço</h1>
+            <p>Conheça profissionais, encontre serviços e cuide do seu jardim com quem entende.</p>
+            <label class="pesquisa"><svg class="icone" aria-hidden="true">
+                <use href="#icone-busca"></use>
+              </svg><span class="sr-only">Pesquisar serviços</span><input type="search" id="campoPesquisa"
+                placeholder="Pesquise por nome, serviço ou localização..."></label>
+          </div>
+          <img class="plant-img"
+            src="/images/monstera-deliciosa-plant-pot-lush-green-leaves-home-decor-indoor-plant-tropical-foliage-vibrant-green-potted-plant-houseplant-greenery-plant-photography.png"
+            alt="Costela-de-adão em um vaso claro">
+        </section>
+        <%- include('../Components/filtros') %>
+          <section class="resultados" aria-labelledby="titulo-resultados">
+            <div class="header-resultados">
+              <h2 id="titulo-resultados">Serviços disponíveis</h2><span id="totalResultados" role="status"></span>
+            </div>
+            <%- include('../Components/listaServicos', { carrossel: true }) %>
+              <div class="lista-acoes"><a href="/servicos" class="link-verde">Ver todos os serviços →</a>
+                <div class="setas-carrossel"><button type="button" class="botao-icone" id="btnPrev"
+                    aria-label="Serviços anteriores">←</button><button type="button" class="botao-icone" id="btnNext"
+                    aria-label="Próximos serviços">→</button></div>
+              </div>
+          </section>
+          <section class="chamada">
+            <div>
+              <h2>Seu cuidado pode transformar um jardim.</h2>
+              <p>Ofereça seus serviços pelo mesmo perfil que você já usa.</p>
+            </div><a href="/perfil?acao=postar" class="botao botao-verde">Postar serviço</a>
+          </section>
+      </main><%- include('../Components/rodape') %></body>
+
+</html>

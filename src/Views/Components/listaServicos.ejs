@@ -1,0 +1,17 @@
+<p class="estado-vazio" id="semResultados" hidden>Nenhum serviço encontrado. Tente outra pesquisa ou limpe os filtros.
+</p>
+<div class="lista-servicos <%= carrossel ? 'lista-carrossel' : '' %>" id="lista-servicos"
+  aria-label="Serviços disponíveis"></div>
+<template id="modelo-anuncio">
+  <article class="card-anuncio">
+    <div class="anuncio-etiquetas"><span class="categoria" data-campo="categoria"></span><span class="nota"
+        data-campo="avaliacao"></span></div>
+    <h3><a data-link="servico" data-campo="titulo"></a></h3>
+    <p class="anuncio-descricao" data-campo="descricao"></p>
+    <a class="anuncio-profissional" data-link="profissional"><span class="avatar-pequeno" data-campo="iniciais"
+        aria-hidden="true"></span><span class="anuncio-pessoa"><strong data-campo="nome"></strong><span
+          data-campo="local"></span></span></a>
+    <div class="anuncio-rodape"><span class="anuncio-preco" data-campo="preco"></span><a class="botao botao-verde"
+        data-link="servico">Ver serviço</a></div>
+  </article>
+</template>

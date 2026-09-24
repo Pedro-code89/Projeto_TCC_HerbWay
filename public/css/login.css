@@ -1,0 +1,17 @@
+/* Acesso */
+.acesso { width: min(470px, calc(100% - 32px)); margin: 48px auto; }
+.form-wrapper { padding: 36px; border-radius: 16px; }
+.selo-acesso { color: var(--verde); font-size: 12px; font-weight: 700; letter-spacing: .8px; }
+.form-wrapper h1 { font-size: 28px; line-height: 1.2; margin: 12px 0; }
+.subtitle { color: var(--cinza); font-size: 15px; margin-bottom: 24px; }
+.form-acesso { display: flex; flex-direction: column; gap: 18px; }
+.form-acesso label { display: flex; flex-direction: column; gap: 7px; font-size: 14px; font-weight: 600; }
+.form-acesso input { min-height: 48px; }
+.campo-senha { display: flex; align-items: center; border: 1px solid var(--borda-forte); border-radius: 7px; }
+.campo-senha input { border: 0; min-width: 0; }
+.mostrar-senha { align-self: stretch; padding-inline: 12px; border: 0; border-radius: 6px; color: var(--verde); background: transparent; font-size: 12px; font-weight: 600; }
+.nota-demo { margin-top: 20px; padding: 12px; border-radius: 8px; background: var(--superficie-2); color: var(--cinza); font-size: 12px; line-height: 1.6; }
+.acesso-demo { width: 100%; margin-top: 16px; font-size: 14px; }
+.form-footer { margin-top: 20px; text-align: center; font-size: 14px; color: var(--cinza); }
+.form-footer a { color: var(--verde); font-weight: 600; }
+@media (max-width: 600px) { .acesso { margin-block: 28px; } .form-wrapper { padding: 26px; } .form-wrapper h1 { font-size: 25px; } }

@@ -1,0 +1,19 @@
+<!DOCTYPE html><html lang="pt-BR">
+<%- include('../Components/head', { titulo: 'Detalhes do serviço', estilos: ['style.css'], scripts: ['servico.js'] }) %>
+<body data-servico="<%= id %>"><%- include('../Components/cabecalho') %>
+<main class="container pagina-detalhe" id="conteudo">
+  <a class="voltar" href="/servicos">← Voltar aos serviços</a>
+  <div id="servico-inexistente" class="estado-vazio" hidden><h1>Serviço indisponível</h1><p>Este anúncio foi pausado ou removido.</p><a href="/servicos" class="link-verde">Encontrar outros serviços</a></div>
+  <div class="detalhe-grid" id="detalhe-conteudo" hidden>
+    <article class="card detalhe-principal"><span class="categoria" id="servico-categoria"></span><h1 id="servico-titulo"></h1><p class="texto-cinza" id="servico-local"></p><div class="divisor"></div><h2>Sobre este serviço</h2><p class="descricao-completa" id="servico-descricao"></p><div class="detalhe-preco"><span>Valor do serviço</span><strong id="servico-preco"></strong></div></article>
+    <aside class="card profissional-card"><span class="avatar" id="profissional-avatar" aria-hidden="true"></span><h2 id="profissional-nome"></h2><p class="texto-cinza" id="profissional-local"></p><p class="nota" id="profissional-avaliacao"></p><a class="botao botao-contorno" id="ver-profissional">Ver perfil</a><button class="botao botao-verde" id="registrar-contratacao" type="button">Registrar contratação</button><a class="botao botao-verde" id="editar-anuncio" hidden>Editar meu anúncio</a><p class="ajuda" id="ajuda-contratacao">Já combinou o serviço com o profissional? Adicione ao seu histórico.</p></aside>
+    <section class="card avaliacoes-servico" id="avaliacoes-servico" hidden>
+      <h2>Avaliações</h2>
+      <p class="texto-cinza" id="avaliacoes-vazio">Este serviço ainda não recebeu avaliações.</p>
+      <ul class="lista-avaliacoes" id="lista-avaliacoes" tabindex="0" aria-label="Avaliações dos clientes"></ul>
+    </section>
+  </div>
+</main>
+<dialog id="modal-contratacao" aria-labelledby="titulo-contratacao"><div class="modal-topo"><h2 id="titulo-contratacao">Registrar contratação</h2><button class="botao-icone" type="button" data-fechar aria-label="Fechar"><svg class="icone" aria-hidden="true"><use href="#icone-fechar"></use></svg></button></div><p class="texto-cinza">Registre um serviço já combinado. Isso não envia uma solicitação ao profissional.</p>
+  <form class="formulario" id="form-contratacao"><label class="campo-inteiro">Data do serviço<input type="date" name="data" required></label><p id="erro-contratacao" class="erro-form campo-inteiro" role="alert" hidden></p><div class="modal-acoes campo-inteiro"><button class="botao botao-contorno" type="button" data-fechar>Cancelar</button><button class="botao botao-verde" type="submit">Adicionar ao histórico</button></div></form>
+</dialog><%- include('../Components/rodape') %></body></html>

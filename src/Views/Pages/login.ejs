@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<%- include('../Components/head', { titulo: 'Entrar' , estilos: ['login.css'], scripts: ['login.js'] }) %>
+
+  <body>
+    <%- include('../Components/cabecalho') %>
+      <main class="acesso" id="conteudo">
+        <section class="card form-wrapper">
+          <span class="selo-acesso">ACESSE SUA CONTA</span>
+          <h1>Entrar na HerbWay</h1>
+          <p class="subtitle">Um perfil para encontrar profissionais e oferecer seus serviços.</p>
+          <form id="form-acesso" class="form-acesso" method="post" action="/login">
+            <label>E-mail<input name="email" id="email" type="email" autocomplete="email" required maxlength="120"
+                placeholder="seuemail@exemplo.com"></label>
+            <label>Senha<div class="campo-senha"><input name="senha" id="senha" type="password"
+                  autocomplete="current-password" required minlength="6" maxlength="128"
+                  placeholder="Digite uma senha de teste"><button type="button" class="mostrar-senha" data-senha="senha"
+                  aria-label="Mostrar senha">Mostrar</button></div></label>
+            <p class="erro-form" id="erro-acesso" role="alert" hidden></p><button class="botao botao-verde"
+              type="submit">Entrar</button>
+          </form>
+          <p class="nota-demo">As informações são salvas no banco de dados HerbwayDB.
+          </p>
+          <button class="botao botao-contorno acesso-demo" id="entrar-demo" type="button">Usar perfil de
+            exemplo</button>
+          <p class="form-footer">Ainda não possui uma conta? <a href="/cadastro">Cadastre-se</a></p>
+        </section>
+      </main>
+      <%- include('../Components/rodape') %>
+  </body>
+
+</html>

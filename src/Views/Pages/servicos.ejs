@@ -1,0 +1,10 @@
+<!DOCTYPE html><html lang="pt-BR">
+<%- include('../Components/head', { titulo: 'Serviços', estilos: ['style.css'], scripts: ['catalogo.js', 'index.js'] }) %>
+<body><%- include('../Components/cabecalho') %>
+<main class="container catalogo" id="conteudo">
+  <div class="titulo-pagina"><div><h1>Encontre o cuidado que seu jardim precisa</h1><p>Explore os serviços cadastrados no HerbWay.</p></div><a class="botao botao-verde" href="/perfil?acao=postar">+ Postar serviço</a></div>
+  <label class="pesquisa"><svg class="icone" aria-hidden="true"><use href="#icone-busca"></use></svg><span class="sr-only">Pesquisar serviços</span><input type="search" id="campoPesquisa" placeholder="Pesquise por nome, serviço ou localização..."></label>
+  <%- include('../Components/filtros') %>
+  <div class="header-resultados"><h2>Serviços cadastrados</h2><span id="totalResultados" role="status"></span></div>
+  <%- include('../Components/listaServicos', { carrossel: false }) %>
+</main><%- include('../Components/rodape') %></body></html>

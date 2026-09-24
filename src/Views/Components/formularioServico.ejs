@@ -1,0 +1,39 @@
+<div class="painel-titulo">
+  <h2 id="titulo-servico">Postar um serviço</h2>
+  <p id="ajuda-servico">Conte o que você faz e encontre pessoas que precisam do seu cuidado.</p>
+</div>
+<form class="formulario formulario-servico" id="form-servico">
+  <label class="campo-inteiro">Nome do serviço <span class="sr-only">obrigatório</span>
+    <input name="titulo" required minlength="3" maxlength="80" placeholder="Ex.: Manutenção de jardins">
+  </label>
+  <label>Categoria
+    <select name="categoria" required>
+      <option value="">Selecione uma categoria</option>
+      <option>Jardinagem</option>
+      <option>Poda</option>
+      <option>Paisagismo</option>
+      <option>Manutenção</option>
+    </select>
+  </label>
+  <label>Preço inicial (R$)
+    <input name="preco" type="number" min="0" max="100000" step="0.01" placeholder="Ex.: 90,00"
+      aria-describedby="ajuda-preco">
+    <small class="ajuda" id="ajuda-preco">Deixe vazio para combinar o valor.</small>
+  </label>
+  <label>Cidade de atendimento<input name="cidade" required maxlength="60" placeholder="Ex.: Amparo"></label>
+  <label>Estado<select name="estado" required data-estados>
+      <option value="">Selecione</option>
+    </select></label>
+  <label class="campo-inteiro">Descrição
+    <textarea name="descricao" required minlength="10" maxlength="600" rows="4"
+      placeholder="Descreva os cuidados que você oferece e o que está incluído no serviço."></textarea>
+  </label>
+  <label class="campo-inteiro opcao-check opcao-publicar"><input name="ativo" type="checkbox" checked> Publicar este
+    serviço no dashboard</label>
+  <p class="erro-form campo-inteiro" id="erro-servico" role="alert" hidden></p>
+  <div class="modal-acoes campo-inteiro acoes-servico">
+    <button class="botao botao-perigo" id="excluir-servico" type="button" hidden>Excluir serviço</button>
+    <button class="botao botao-contorno" id="cancelar-servico" type="button">Cancelar</button>
+    <button class="botao botao-verde" id="salvar-servico" type="submit">Publicar serviço</button>
+  </div>
+</form>
