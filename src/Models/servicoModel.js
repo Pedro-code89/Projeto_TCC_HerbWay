@@ -25,6 +25,14 @@ async function listar() {
     GROUP BY an.id_anuncio
     ORDER BY an.id_anuncio DESC
   `);
+  return mascarar(rows);
+}
+
+function mascarar(rows) {
+  rows.forEach(r => {
+    const d = (r.telefone || '').replace(/\D/g, '');
+    r.telefone = d.length >= 4 ? `(${d.slice(0, 2)}) 9****-****` : null;
+  });
   return rows;
 }
 
@@ -45,7 +53,22 @@ async function buscarPorId(id) {
     WHERE an.id_anuncio = ?
     GROUP BY an.id_anuncio
   `, [id]);
-  return rows[0] || null;
+  return rows[0] ? mascarar(rows)[0] : null;
+}
+
+async function buscarTelefone(id) {
+  const [rows] = await pool.query(`
+    SELECT u.telefone FROM anuncios an INNER JOIN usuarios u ON u.id_usuario = an.id_usuario
+    WHERE an.id_anuncio = ?
+  `, [id]);
+  return rows[0]?.telefone || null;
+}
+
+async function criarMensagem(idAnuncio, dados) {
+  await pool.query(
+    'INSERT INTO mensagens (id_anuncio, nome, email, telefone, mensagem) VALUES (?, ?, ?, ?, ?)',
+    [idAnuncio, dados.nome, dados.email, dados.telefone || null, dados.mensagem]
+  );
 }
 
 async function categoriaId(nome) {
@@ -84,4 +107,4 @@ async function excluir(id, usuarioId) {
   if (!result.affectedRows) throw new Error('Este serviço não está disponível para exclusão.');
 }
 
-module.exports = { listar, buscarPorId, criar, atualizar, excluir };
+module.exports = { listar, buscarPorId, criar, atualizar, excluir, buscarTelefone, criarMensagem };

@@ -2,7 +2,7 @@ const { pool } = require('../Config/database');
 
 async function listar() {
   const [rows] = await pool.query(`
-    SELECT u.id_usuario AS id, u.nome, u.email, u.telefone, u.cidade, u.estado, u.bairro, u.sobre,
+    SELECT u.id_usuario AS id, u.nome, u.email, u.telefone, u.cidade, u.estado, u.bairro, u.sobre, u.foto, u.email_verificado,
            COALESCE(ROUND(AVG(a.nota), 1), 0) AS avaliacao,
            COUNT(a.id_avaliacao) AS avaliacoes
     FROM usuarios u
@@ -15,7 +15,7 @@ async function listar() {
 
 async function buscarPorId(id) {
   const [rows] = await pool.query(`
-    SELECT u.id_usuario AS id, u.nome, u.email, u.telefone, u.cidade, u.estado, u.bairro, u.sobre,
+    SELECT u.id_usuario AS id, u.nome, u.email, u.telefone, u.cidade, u.estado, u.bairro, u.sobre, u.foto, u.email_verificado,
            COALESCE(ROUND(AVG(a.nota), 1), 0) AS avaliacao,
            COUNT(a.id_avaliacao) AS avaliacoes
     FROM usuarios u
@@ -32,24 +32,36 @@ async function buscarPorEmail(email) {
 }
 
 async function criar({ nome, email, senha }) {
+  const bcrypt = require('bcryptjs');
+  const hash = await bcrypt.hash(senha, 10);
   const [result] = await pool.query(
-    'INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)',
-    [nome, email, senha]
+    'INSERT INTO usuarios (nome, email, senha, email_verificado) VALUES (?, ?, ?, 0)',
+    [nome, email, hash]
   );
   return buscarPorId(result.insertId);
+}
+
+async function atualizarSenha(id, senha) {
+  const bcrypt = require('bcryptjs');
+  const hash = await bcrypt.hash(senha, 10);
+  await pool.query('UPDATE usuarios SET senha = ? WHERE id_usuario = ?', [hash, id]);
+}
+
+async function confirmarEmail(id) {
+  await pool.query('UPDATE usuarios SET email_verificado = 1 WHERE id_usuario = ?', [id]);
 }
 
 async function atualizar(id, campos) {
   const sql = `
     UPDATE usuarios
-    SET nome = ?, email = ?, telefone = ?, cidade = ?, estado = ?, bairro = ?, sobre = ?
+    SET nome = ?, email = ?, telefone = ?, cidade = ?, estado = ?, bairro = ?, sobre = ?, foto = ?
     WHERE id_usuario = ?
   `;
   await pool.query(sql, [
     campos.nome, campos.email, campos.telefone || null, campos.cidade || null,
-    campos.estado || null, campos.bairro || null, campos.sobre || null, id
+    campos.estado || null, campos.bairro || null, campos.sobre || null, campos.foto || null, id
   ]);
   return buscarPorId(id);
 }
 
-module.exports = { listar, buscarPorId, buscarPorEmail, criar, atualizar };
+module.exports = { listar, buscarPorId, buscarPorEmail, criar, atualizar, atualizarSenha, confirmarEmail };

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<%- include('../Components/head', { titulo: 'Esqueci a senha', estilos: ['login.css'], scripts: ['esqueciSenha.js'] }) %>
+<body>
+  <%- include('../Components/cabecalho') %>
+  <main class="acesso" id="conteudo">
+    <section class="card form-wrapper">
+      <span class="selo-acesso">RECUPERAÇÃO</span>
+      <h1>Esqueci minha senha</h1>
+      <p class="subtitle">Informe seu e-mail e enviaremos um link para redefinir sua senha.</p>
+      <form id="form-acesso" class="form-acesso">
+        <label>E-mail<input name="email" id="email" type="email" autocomplete="email" required maxlength="120" placeholder="seuemail@exemplo.com"></label>
+        <p class="erro-form" id="erro-acesso" role="alert" hidden></p>
+        <button class="botao botao-verde" type="submit">Enviar link</button>
+      </form>
+      <p class="form-footer"><a href="/login">Voltar ao login</a></p>
+    </section>
+  </main>
+  <%- include('../Components/rodape') %>
+</body>
+</html>

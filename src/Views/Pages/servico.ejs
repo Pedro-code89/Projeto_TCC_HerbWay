@@ -6,7 +6,31 @@
   <div id="servico-inexistente" class="estado-vazio" hidden><h1>Serviço indisponível</h1><p>Este anúncio foi pausado ou removido.</p><a href="/servicos" class="link-verde">Encontrar outros serviços</a></div>
   <div class="detalhe-grid" id="detalhe-conteudo" hidden>
     <article class="card detalhe-principal"><span class="categoria" id="servico-categoria"></span><h1 id="servico-titulo"></h1><p class="texto-cinza" id="servico-local"></p><div class="divisor"></div><h2>Sobre este serviço</h2><p class="descricao-completa" id="servico-descricao"></p><div class="detalhe-preco"><span>Valor do serviço</span><strong id="servico-preco"></strong></div></article>
-    <aside class="card profissional-card"><span class="avatar" id="profissional-avatar" aria-hidden="true"></span><h2 id="profissional-nome"></h2><p class="texto-cinza" id="profissional-local"></p><p class="nota" id="profissional-avaliacao"></p><a class="botao botao-contorno" id="ver-profissional">Ver perfil</a><button class="botao botao-verde" id="registrar-contratacao" type="button">Registrar contratação</button><a class="botao botao-verde" id="editar-anuncio" hidden>Editar meu anúncio</a><p class="ajuda" id="ajuda-contratacao">Já combinou o serviço com o profissional? Adicione ao seu histórico.</p></aside>
+    <div class="coluna-lateral">
+      <aside class="card profissional-card"><span class="avatar" id="profissional-avatar" aria-hidden="true"></span><h2 id="profissional-nome"></h2><p class="texto-cinza" id="profissional-local"></p><p class="nota" id="profissional-avaliacao"></p><a class="botao botao-contorno" id="ver-profissional">Visualizar perfil</a>
+        <div class="telefone-box campo-inteiro" id="telefone-box">
+          <span class="telefone-rotulo">Telefone do profissional</span>
+          <span class="telefone-numero" id="telefone-exibicao">(--)-****-****</span>
+          <div class="telefone-acoes">
+            <button class="botao botao-verde" id="desbloquear-telefone" type="button">Desbloquear telefone</button>
+            <button class="botao botao-contorno" id="copiar-telefone" type="button" hidden>Copiar telefone</button>
+          </div>
+        </div>
+        <button class="botao botao-verde" id="registrar-contratacao" type="button">Registrar contratação</button><a class="botao botao-verde" id="editar-anuncio" hidden>Editar meu anúncio</a><p class="ajuda" id="ajuda-contratacao">Já combinou o serviço com o profissional? Adicione ao seu histórico.</p>
+      </aside>
+      <section class="card contato-card" aria-labelledby="titulo-contato">
+        <h2 id="titulo-contato">Envie uma mensagem ao vendedor</h2>
+        <form class="formulario" id="form-mensagem" novalidate>
+          <label class="campo-inteiro">Nome completo<input name="nome" autocomplete="name" required maxlength="100" placeholder="Seu nome completo"></label>
+          <label>E-mail<input name="email" type="email" autocomplete="email" required maxlength="150" placeholder="seuemail@exemplo.com"></label>
+          <label class="campo-inteiro">Telefone<input name="telefone" type="tel" autocomplete="tel" maxlength="25" placeholder="(19) 99999-9999"></label>
+          <label class="campo-inteiro">Mensagem<textarea name="mensagem" rows="4" maxlength="1000" required>Olá, tenho interesse no seu serviço. Poderia me passar mais informações?</textarea></label>
+          <p id="erro-mensagem" class="erro-form campo-inteiro" role="alert" hidden></p>
+          <p id="sucesso-mensagem" class="sucesso-form campo-inteiro" role="status" hidden>Mensagem enviada com sucesso! O profissional entrará em contato.</p>
+          <button class="botao botao-verde campo-inteiro" id="enviar-mensagem" type="submit">Enviar mensagem</button>
+        </form>
+      </section>
+    </div>
     <section class="card avaliacoes-servico" id="avaliacoes-servico" hidden>
       <h2>Avaliações</h2>
       <p class="texto-cinza" id="avaliacoes-vazio">Este serviço ainda não recebeu avaliações.</p>

@@ -3,7 +3,7 @@ const { pool } = require('../Config/database');
 
 router.get('/api/dados', async (req, res) => {
   const [usuarios] = await pool.query(`
-    SELECT u.id_usuario AS id, u.nome, u.email, u.telefone, u.cidade, u.estado, u.bairro, u.sobre,
+    SELECT u.id_usuario AS id, u.nome, u.email, u.telefone, u.cidade, u.estado, u.bairro, u.sobre, u.foto,
            COALESCE(ROUND(AVG(a.nota), 1), 0) AS avaliacao,
            COUNT(a.id_avaliacao) AS avaliacoes
     FROM usuarios u LEFT JOIN avaliacoes a ON a.id_profissional = u.id_usuario
@@ -25,6 +25,7 @@ router.get('/api/dados', async (req, res) => {
         u.telefone,
         u.bairro,
         u.sobre,
+        u.foto,
         COALESCE(ROUND(AVG(av.nota), 1), 0) AS avaliacao,
         COUNT(av.id_avaliacao) AS avaliacoes
     FROM anuncios an
@@ -48,10 +49,19 @@ router.get('/api/dados', async (req, res) => {
         u.nome,
         u.telefone,
         u.bairro,
-        u.sobre
+        u.sobre,
+        u.foto
     ORDER BY an.id_anuncio DESC
 `);
   let contratacoes = [];
+  const mascararTelefone = telefone => {
+    if (!telefone) return null;
+    const digitos = telefone.replace(/\D/g, '');
+    if (digitos.length < 4) return null;
+    return `(${digitos.slice(0, 2)}) 9****-****`;
+  };
+  usuarios.forEach(u => { u.telefone = mascararTelefone(u.telefone); });
+  servicos.forEach(s => { s.telefone = mascararTelefone(s.telefone); });
   if (req.session.usuarioId) {
     const [rows] = await pool.query(`
       SELECT c.id_contratacao AS id, c.id_cliente AS usuarioId, c.id_anuncio AS servicoId,

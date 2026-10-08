@@ -41,9 +41,7 @@ window.HerbWay = (() => {
       return usuarioAtual;
     },
     async cadastrar(nome, email, senha) {
-      usuarioAtual = await requisicao('/cadastro', { method: 'POST', body: JSON.stringify({ nome, email, senha }) });
-      await carregar();
-      return usuarioAtual;
+      return await requisicao('/cadastro', { method: 'POST', body: JSON.stringify({ nome, email, senha }) });
     },
     async editarPerfil(campos) {
       usuarioAtual = await requisicao('/api/perfil', { method: 'PUT', body: JSON.stringify(campos) });
@@ -80,6 +78,17 @@ window.HerbWay = (() => {
       try { await requisicao('/api/logout', { method: 'POST' }); } finally { usuarioAtual = null; }
     },
     estados: estadosHerbWay,
+    aplicarAvatar: (elemento, usuario) => {
+      if (!elemento || !usuario) return;
+      if (usuario.foto) {
+        elemento.innerHTML = '';
+        const img = document.createElement('img');
+        img.src = usuario.foto; img.alt = '';
+        elemento.append(img);
+      } else {
+        elemento.textContent = usuario.nome.trim().split(/\s+/).slice(0, 2).map(parte => parte[0]).join('').toUpperCase();
+      }
+    },
     iniciais: nome => nome.trim().split(/\s+/).slice(0, 2).map(parte => parte[0]).join('').toUpperCase(),
     nomeCurto: nome => nome.trim().split(/\s+/).slice(0, 2).join(' '),
     moeda: valor => valor === null || valor === undefined ? 'A combinar' : 'A partir de ' + Number(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),

@@ -46,6 +46,8 @@ function mostrarCatalogo(servicos) {
       }
     });
 
+    HerbWay.aplicarAvatar(card.querySelector('.avatar-pequeno'), { nome, foto: servico.foto });
+
     card.querySelectorAll('[data-link="servico"]').forEach(link => {
       link.href = '/servicos/' + encodeURIComponent(servico.id);
     });

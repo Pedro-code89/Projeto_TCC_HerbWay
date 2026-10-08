@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<%- include('../Components/head', { titulo: 'Redefinir senha', estilos: ['login.css'], scripts: ['redefinir.js'] }) %>
+<body>
+  <%- include('../Components/cabecalho') %>
+  <main class="acesso" id="conteudo">
+    <section class="card form-wrapper">
+      <span class="selo-acesso">NOVA SENHA</span>
+      <h1>Redefina sua senha</h1>
+      <form id="form-acesso" class="form-acesso">
+        <input type="hidden" name="token" id="token" value="<%= token %>">
+        <label>Nova senha<div class="campo-senha"><input name="senha" id="senha" type="password" autocomplete="new-password" required minlength="6" maxlength="128"><button type="button" class="mostrar-senha" data-senha="senha" aria-label="Mostrar senha">Mostrar</button></div></label>
+        <label>Confirmar nova senha<input name="confirmar_senha" id="confirmar_senha" type="password" autocomplete="new-password" required minlength="6" maxlength="128"></label>
+        <p class="erro-form" id="erro-acesso" role="alert" hidden></p>
+        <button class="botao botao-verde" type="submit">Salvar nova senha</button>
+      </form>
+      <p class="form-footer"><a href="/login">Voltar ao login</a></p>
+    </section>
+  </main>
+  <%- include('../Components/rodape') %>
+</body>
+</html>

@@ -199,6 +199,8 @@
             <label class="campo-inteiro">Endereço<input name="bairro" maxlength="60" placeholder="Seu bairro, Rua, Numero etc"></label>
             <label class="campo-inteiro">Sobre mim<textarea name="sobre" rows="3" maxlength="300"
                 placeholder="Conte um pouco sobre você e sua relação com as plantas."></textarea></label>
+            <label class="campo-inteiro">Foto de perfil<input name="foto" id="foto-perfil" type="file" accept="image/*"></label>
+            <img id="preview-foto" class="campo-inteiro" alt="Pré-visualização da foto de perfil" hidden style="width:96px;height:96px;object-fit:cover;border-radius:50%;">
             <p id="erro-perfil" class="erro-form campo-inteiro" role="alert" hidden></p>
             <div class="modal-acoes campo-inteiro">
               <button class="botao botao-contorno" type="button" data-fechar>Cancelar</button>

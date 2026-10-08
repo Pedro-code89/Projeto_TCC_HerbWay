@@ -5,23 +5,33 @@
       <div class="container cabecalho-conteudo">
         <a class="logo" href="/" aria-label="HerbWay — início"><img src="/images/plant-pot(white).svg" width="30"
             height="30" alt=""><span>HerbWay</span></a>
+        <a class="avatar avatar-cabecalho" id="avatar-cabecalho" href="/perfil" data-conta hidden aria-label="Meu perfil"></a>
         <button class="botao-menu" id="botao-menu" type="button" aria-controls="menu-principal" aria-expanded="false"
           aria-label="Abrir menu"><svg class="icone" aria-hidden="true">
-            <use href="#icone-menu"></use>
+            <use href="#icone-pontinhos"></use>
           </svg></button>
-        <nav class="navegacao" id="menu-principal" aria-label="Menu principal">
-          <a href="/" <%- paginaAtual==='dashboard' ? 'class="link-ativo" aria-current="page"' : '' %>>Dashboard</a>
-          <a href="/servicos" <%- paginaAtual==='servicos' ? 'class="link-ativo" aria-current="page"' : ''
-            %>>Serviços</a>
-          <a href="/login" data-visitante>Entrar</a><a class="link-claro" href="/cadastro" data-visitante>Criar
-            conta</a>
-          <a href="/perfil" data-conta hidden <%- paginaAtual==='perfil' ? 'class="link-ativo" aria-current="page"' : ''
-            %>>Meu perfil</a>
-          <button class="botao-tema" type="button" id="alternar-tema" aria-pressed="false" aria-label="Ativar modo escuro"
-            title="Ativar modo escuro"><svg class="icone" aria-hidden="true">
-              <use href="#icone-lua" id="uso-icone-tema"></use>
-            </svg><span id="rotulo-tema">Modo escuro</span></button>
-          <button class="botao-sair" type="button" id="sair" data-conta hidden>Sair</button>
-        </nav>
       </div>
     </header>
+    <div class="menu-fundo" id="fundo-menu"></div>
+    <nav class="painel-menu" id="menu-principal" aria-label="Menu principal">
+      <div class="painel-menu-topo">
+        <span class="painel-menu-titulo">Menu</span>
+        <button class="botao-fechar-painel" id="fechar-menu" type="button" aria-label="Fechar menu">
+          <svg class="icone" aria-hidden="true">
+            <use href="#icone-fechar"></use>
+          </svg>
+        </button>
+      </div>
+      <a href="/" <%- paginaAtual==='dashboard' ? 'class="link-ativo" aria-current="page"' : '' %>>Dashboard</a>
+      <a href="/servicos" <%- paginaAtual==='servicos' ? 'class="link-ativo" aria-current="page"' : ''
+    %>>Serviços</a>
+      <a href="/login" data-visitante>Entrar</a><a class="link-claro" href="/cadastro" data-visitante>Criar
+        conta</a>
+      <a href="/perfil" data-conta hidden <%- paginaAtual==='perfil' ? 'class="link-ativo" aria-current="page"' : ''
+    %>>Meu perfil</a>
+      <button class="botao-tema" type="button" id="alternar-tema" aria-pressed="false" aria-label="Ativar modo escuro"
+        title="Ativar modo escuro"><svg class="icone" aria-hidden="true">
+          <use href="#icone-lua" id="uso-icone-tema"></use>
+        </svg><span id="rotulo-tema">Modo escuro</span></button>
+      <button class="botao-sair" type="button" id="sair" data-conta hidden>Sair</button>
+    </nav>

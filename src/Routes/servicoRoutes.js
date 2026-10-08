@@ -10,4 +10,7 @@ router.post('/api/servicos', servicoController.exigirLogin, servicoController.ap
 router.put('/api/servicos/:id', servicoController.exigirLogin, servicoController.apiAtualizar);
 router.delete('/api/servicos/:id', servicoController.exigirLogin, servicoController.apiExcluir);
 
+router.post('/api/servicos/:id/mensagens', servicoController.apiMensagem);
+router.get('/api/servicos/:id/telefone', servicoController.exigirLogin, servicoController.apiTelefone);
+
 module.exports = router;

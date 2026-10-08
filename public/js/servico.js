@@ -6,7 +6,7 @@
   for (const campo of ['titulo', 'categoria', 'descricao']) document.getElementById('servico-' + campo).textContent = servicoAtual[campo];
   document.querySelector('#servico-local').textContent = `${servicoAtual.cidade}, ${servicoAtual.estado}`;
   document.querySelector('#servico-preco').textContent = HerbWay.moeda(servicoAtual.preco);
-  document.querySelector('#profissional-avatar').textContent = HerbWay.iniciais(servicoAtual.nome);
+  HerbWay.aplicarAvatar(document.querySelector('#profissional-avatar'), { nome: servicoAtual.nome, foto: servicoAtual.foto });
   document.querySelector('#profissional-nome').textContent = HerbWay.nomeCurto(servicoAtual.nome);
   document.querySelector('#profissional-local').textContent = `${servicoAtual.cidade}, ${servicoAtual.estado}`;
   document.querySelector('#profissional-avaliacao').textContent = HerbWay.avaliacao(servicoAtual);
@@ -16,6 +16,60 @@
   document.querySelector('#ajuda-contratacao').hidden = proprio;
   document.querySelector('#editar-anuncio').hidden = !proprio;
   document.querySelector('#editar-anuncio').href = '/perfil?editar=' + encodeURIComponent(servicoAtual.id);
+
+  // Telefone: exibe a versão mascarada; desbloqueio exige login e busca o número real na API.
+  const telefoneExibicao = document.querySelector('#telefone-exibicao');
+  const telefoneBox = document.querySelector('#telefone-box');
+  if (!servicoAtual.telefone) { telefoneBox.hidden = true; } else { telefoneExibicao.textContent = servicoAtual.telefone; }
+  const botaoDesbloquear = document.querySelector('#desbloquear-telefone');
+  const botaoCopiar = document.querySelector('#copiar-telefone');
+  let telefoneReal = null;
+  botaoDesbloquear.addEventListener('click', async () => {
+    if (!HerbWay.conta()) { irParaLogin(); return; }
+    botaoDesbloquear.disabled = true; botaoDesbloquear.textContent = 'Desbloqueando...';
+    try {
+      const resposta = await fetch('/api/servicos/' + encodeURIComponent(servicoAtual.id) + '/telefone');
+      const corpo = await resposta.json();
+      if (!resposta.ok) throw new Error(corpo.erro || 'Não foi possível desbloquear.');
+      telefoneReal = corpo.telefone;
+      telefoneExibicao.textContent = telefoneReal || 'Telefone não informado';
+      botaoDesbloquear.hidden = true;
+      botaoCopiar.hidden = !telefoneReal;
+    } catch (erro) { mostrarAviso(erro.message); }
+    finally { botaoDesbloquear.disabled = false; botaoDesbloquear.textContent = 'Desbloquear telefone'; }
+  });
+  botaoCopiar.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(telefoneReal || ''); mostrarAviso('Telefone copiado!'); }
+    catch { mostrarAviso('Não foi possível copiar.'); }
+  });
+
+  // Formulário de contato com o profissional.
+  const formMensagem = document.querySelector('#form-mensagem');
+  formMensagem.addEventListener('submit', async evento => {
+    evento.preventDefault();
+    const nome = formMensagem.elements.nome.value.trim();
+    const email = formMensagem.elements.email.value.trim();
+    const telefone = formMensagem.elements.telefone.value.trim();
+    const mensagem = formMensagem.elements.mensagem.value.trim();
+    document.querySelector('#sucesso-mensagem').hidden = true;
+    if (!nome || !email || !mensagem) { mostrarErro('erro-mensagem', 'Preencha nome, e-mail e mensagem.'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { mostrarErro('erro-mensagem', 'Informe um e-mail válido.'); return; }
+    mostrarErro('erro-mensagem', '');
+    const botaoEnviar = document.querySelector('#enviar-mensagem');
+    botaoEnviar.disabled = true; botaoEnviar.textContent = 'Enviando...';
+    try {
+      const resposta = await fetch('/api/servicos/' + encodeURIComponent(servicoAtual.id) + '/mensagens', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome, email, telefone, mensagem })
+      });
+      const corpo = await resposta.json().catch(() => ({}));
+      if (!resposta.ok) throw new Error(corpo.erro || 'Não foi possível enviar a mensagem.');
+      document.querySelector('#sucesso-mensagem').hidden = false;
+      formMensagem.reset();
+      formMensagem.elements.mensagem.value = 'Olá, tenho interesse no seu serviço. Poderia me passar mais informações?';
+    } catch (erro) { mostrarErro('erro-mensagem', erro.message); }
+    finally { botaoEnviar.disabled = false; botaoEnviar.textContent = 'Enviar mensagem'; }
+  });
 
   // Avaliações deste anúncio (mais recentes primeiro), empilhadas com rolagem própria.
   const avaliacoes = (HerbWay.ler().avaliacoes || []).filter(item => String(item.servicoId) === String(servicoAtual.id));

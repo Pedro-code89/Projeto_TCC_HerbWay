@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<%- include('../Components/head', { titulo: 'Confirmar e-mail', estilos: ['login.css'], scripts: [] }) %>
+<body>
+  <%- include('../Components/cabecalho') %>
+  <main class="acesso" id="conteudo">
+    <section class="card form-wrapper">
+      <span class="selo-acesso">E-MAIL</span>
+      <% if (typeof ok !== 'undefined' && ok) { %>
+      <h1>E-mail confirmado!</h1>
+      <p class="subtitle">Sua conta foi verificada com sucesso. Agora você pode entrar e usar todos os recursos do HerbWay.</p>
+      <a class="botao botao-verde" href="/login">Ir para o login</a>
+      <% } else { %>
+      <h1>Não foi possível confirmar</h1>
+      <p class="subtitle"><%= typeof erro !== 'undefined' ? erro : 'Link inválido.' %></p>
+      <a class="botao botao-verde" href="/reenviar-verificacao">Reenviar e-mail de verificação</a>
+      <% } %>
+    </section>
+  </main>
+  <%- include('../Components/rodape') %>
+</body>
+</html>

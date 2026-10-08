@@ -1,24 +1,40 @@
 const menuHerbWay = document.querySelector('#menu-principal');
 const botaoMenuHerbWay = document.querySelector('#botao-menu');
+const fundoMenuHerbWay = document.querySelector('#fundo-menu');
 
 function atualizarCabecalho() {
   const conectado = Boolean(HerbWay.conta());
   document.querySelectorAll('[data-conta]').forEach(item => { item.hidden = !conectado; });
   document.querySelectorAll('[data-visitante]').forEach(item => { item.hidden = conectado; });
+  if (conectado) HerbWay.aplicarAvatar(document.querySelector('#avatar-cabecalho'), HerbWay.conta());
+}
+function abrirMenu() {
+  menuHerbWay?.classList.add('aberto');
+  fundoMenuHerbWay?.classList.add('aberto');
+  botaoMenuHerbWay?.setAttribute('aria-expanded', 'true');
+  botaoMenuHerbWay?.setAttribute('aria-label', 'Fechar menu');
+  document.querySelector('#fechar-menu')?.focus();
 }
 function fecharMenu() {
   menuHerbWay?.classList.remove('aberto');
+  fundoMenuHerbWay?.classList.remove('aberto');
   botaoMenuHerbWay?.setAttribute('aria-expanded', 'false');
   botaoMenuHerbWay?.setAttribute('aria-label', 'Abrir menu');
 }
-botaoMenuHerbWay?.addEventListener('click', () => {
-  const aberto = menuHerbWay.classList.toggle('aberto');
-  botaoMenuHerbWay.setAttribute('aria-expanded', String(aberto));
-  botaoMenuHerbWay.setAttribute('aria-label', aberto ? 'Fechar menu' : 'Abrir menu');
-});
-document.addEventListener('click', evento => { if (!evento.target.closest('.cabecalho')) fecharMenu(); });
+function alternarMenu() { menuHerbWay?.classList.contains('aberto') ? fecharMenu() : abrirMenu(); }
+botaoMenuHerbWay?.addEventListener('click', alternarMenu);
+document.querySelector('#fechar-menu')?.addEventListener('click', () => { fecharMenu(); botaoMenuHerbWay?.focus(); });
+fundoMenuHerbWay?.addEventListener('click', fecharMenu);
+/* Mantém a navegação por teclado dentro do painel enquanto ele estiver aberto. */
 document.addEventListener('keydown', evento => {
-  if (evento.key === 'Escape' && menuHerbWay?.classList.contains('aberto')) { fecharMenu(); botaoMenuHerbWay.focus(); }
+  if (!menuHerbWay?.classList.contains('aberto')) return;
+  if (evento.key === 'Escape') { fecharMenu(); botaoMenuHerbWay?.focus(); return; }
+  if (evento.key !== 'Tab') return;
+  const focaveis = [...menuHerbWay.querySelectorAll('a[href], button:not([hidden])')].filter(item => item.offsetParent !== null);
+  if (!focaveis.length) return;
+  const primeiro = focaveis[0], ultimo = focaveis[focaveis.length - 1];
+  if (evento.shiftKey && document.activeElement === primeiro) { evento.preventDefault(); ultimo.focus(); }
+  else if (!evento.shiftKey && document.activeElement === ultimo) { evento.preventDefault(); primeiro.focus(); }
 });
 document.querySelector('#sair')?.addEventListener('click', async () => { await HerbWay.sair(); location.assign('/login'); });
 function irParaLogin() { location.assign('/login?voltar=' + encodeURIComponent(location.pathname + location.search)); }
@@ -54,7 +70,7 @@ refletirTema(document.documentElement.dataset.tema || 'claro');
 
 function validarFormulario(formulario) {
   for (const campo of formulario.querySelectorAll('input, textarea')) {
-    if (!['password', 'checkbox', 'date', 'number'].includes(campo.type)) campo.value = campo.value.trim();
+    if (!['password', 'checkbox', 'date', 'number', 'file'].includes(campo.type)) campo.value = campo.value.trim();
     campo.setCustomValidity('');
     if (campo.minLength > 0 && campo.value.length < campo.minLength) campo.setCustomValidity(`Preencha com pelo menos ${campo.minLength} caracteres.`);
   }
@@ -79,3 +95,4 @@ HerbWay.pronto.then(() => {
   window.dispatchEvent(new Event('herbway:atualizado'));
 }).catch(erro => console.error('Erro ao carregar dados:', erro));
 window.addEventListener('pageshow', atualizarCabecalho);
+window.addEventListener('herbway:atualizado', atualizarCabecalho);

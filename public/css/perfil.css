@@ -65,7 +65,7 @@
 
 /* Avaliação */
 .seletor-nota { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 20px; }
-.estrela { display: inline-flex; align-items: center; justify-content: center; width: 50px; min-height: 50px; padding: 0; border: 1px solid var(--borda); border-radius: 8px; background: var(--campo); color: var(--estrela-inativa); font-size: 26px; line-height: 1; }
+.estrela { display: inline-flex; align-items: center; justify-content: center; width: 50px; min-height: 50px; padding: 0; border: 1px solid var(--borda); border-radius: 50%; background: var(--campo); color: var(--estrela-inativa); font-size: 26px; line-height: 1; }
 .estrela:hover { border-color: var(--nota-cor); }
 .estrela.ativa { border-color: var(--nota-cor); background: var(--nota-fundo); color: var(--nota-cor); }
 #avaliacao-servico { text-align: center; overflow-wrap: anywhere; }

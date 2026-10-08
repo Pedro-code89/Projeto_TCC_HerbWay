@@ -7,7 +7,9 @@ CREATE TABLE usuarios (
     cidade VARCHAR(100),
     estado CHAR(2),
     bairro VARCHAR(100),
-    sobre TEXT
+    sobre TEXT,
+    foto MEDIUMTEXT,
+    email_verificado TINYINT(1) NOT NULL DEFAULT 0
 );
 
 CREATE TABLE categorias (
@@ -34,6 +36,34 @@ CREATE TABLE anuncios (
     CONSTRAINT fk_anuncio_categoria
         FOREIGN KEY (id_categoria)
         REFERENCES categorias(id_categoria)
+);
+
+CREATE TABLE tokens (
+    id_token INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    tipo VARCHAR(20) NOT NULL,
+    token_hash CHAR(64) NOT NULL,
+    expira_em DATETIME NOT NULL,
+    usado TINYINT(1) NOT NULL DEFAULT 0,
+    criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_token_usuario
+        FOREIGN KEY (id_usuario)
+        REFERENCES usuarios(id_usuario)
+);
+
+CREATE TABLE mensagens (
+    id_mensagem INT AUTO_INCREMENT PRIMARY KEY,
+    id_anuncio INT NOT NULL,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL,
+    telefone VARCHAR(20),
+    mensagem TEXT NOT NULL,
+    data_envio DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_mensagem_anuncio
+        FOREIGN KEY (id_anuncio)
+        REFERENCES anuncios(id_anuncio)
 );
 
 CREATE TABLE contratacoes (

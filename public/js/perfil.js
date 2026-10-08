@@ -12,6 +12,7 @@
   let idEdicao = null;
   let idContratacao = null;
   let notaSelecionada = 0;
+  let fotoSelecionada = null;
 
   const preencher = (seletor, valor) => document.querySelector(seletor).textContent = valor ?? '';
 
@@ -22,17 +23,19 @@
     document.querySelector('#servicos-publicos').hidden = proprio;
     preencher('#titulo-pagina', proprio ? 'Meu perfil' : 'Perfil');
     preencher('#nome-perfil', proprio ? HerbWay.nomeCurto(perfil.nome) : perfil.nome);
-    preencher('#avatar', HerbWay.iniciais(perfil.nome));
+    HerbWay.aplicarAvatar(document.querySelector('#avatar'), perfil);
     preencher('#local-perfil', [perfil.cidade, perfil.estado].filter(Boolean).join(', ') || 'Localização não informada');
     preencher('#tipo-perfil', servicos.some(s => s.ativo) ? 'Oferece serviços' : 'Perfil pessoal');
     preencher('#descricao-publica', perfil.sobre || 'Este perfil ainda não adicionou uma descrição.');
-    camposPerfil.forEach(campo => preencher('#dado-' + campo, proprio ? (campo === 'estado' ? (HerbWay.estados[perfil.estado] || 'Não informado') : (perfil[campo] || 'Não informado')) : ''));
+    const fonte = proprio && HerbWay.conta() ? HerbWay.conta() : perfil;
+    camposPerfil.forEach(campo => preencher('#dado-' + campo, proprio ? (campo === 'estado' ? (HerbWay.estados[fonte.estado] || 'Não informado') : (fonte[campo] || 'Não informado')) : ''));
   }
 
   document.querySelector('#editar-perfil').addEventListener('click', () => {
     const perfil = HerbWay.conta();
     if (!perfil) return irParaLogin();
     camposPerfil.forEach(campo => formPerfil.elements[campo].value = perfil[campo] || '');
+    fotoSelecionada = null; formPerfil.elements.foto.value = ''; document.querySelector('#preview-foto').hidden = true;
     mostrarErro('erro-perfil', ''); modalPerfil.showModal();
   });
   formPerfil.addEventListener('submit', async evento => {
@@ -40,8 +43,18 @@
     if (!validarFormulario(formPerfil)) return;
     const campos = {};
     camposPerfil.forEach(campo => campos[campo] = formPerfil.elements[campo].value.trim());
+    if (fotoSelecionada) campos.foto = fotoSelecionada;
     try { await HerbWay.editarPerfil(campos); modalPerfil.close(); mostrarAviso('Perfil atualizado com sucesso.'); }
     catch (erro) { mostrarErro('erro-perfil', erro.message); }
+  });
+  formPerfil.elements.foto.addEventListener('change', () => {
+    const arquivo = formPerfil.elements.foto.files[0];
+    if (!arquivo) { fotoSelecionada = null; return; }
+    if (!arquivo.type.startsWith('image/')) { mostrarErro('erro-perfil', 'Selecione um arquivo de imagem.'); return; }
+    if (arquivo.size > 5 * 1024 * 1024) { mostrarErro('erro-perfil', 'A foto deve ter no máximo 5 MB.'); return; }
+    const leitor = new FileReader();
+    leitor.onload = () => { fotoSelecionada = leitor.result; const preview = document.querySelector('#preview-foto'); preview.src = fotoSelecionada; preview.hidden = false; };
+    leitor.readAsDataURL(arquivo);
   });
 
   function trocarAba(painel, atualizarEndereco = true) {
