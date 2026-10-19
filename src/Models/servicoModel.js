@@ -1,4 +1,21 @@
 const { pool } = require('../Config/database');
+const localidadeService = require('../Services/localidadeService');
+
+function validarLocalidade(cidade, estado) {
+  const erroValidacao = (mensagem) => {
+    const e = new Error(mensagem);
+    e.statusCode = 400;
+    return e;
+  };
+  if (!cidade || !estado) throw erroValidacao('Cidade e estado são obrigatórios.');
+  const cidadeTrim = String(cidade).trim();
+  const estadoTrim = String(estado).trim().toUpperCase();
+  if (!cidadeTrim || !estadoTrim) throw erroValidacao('Cidade e estado são obrigatórios.');
+  if (!localidadeService.validarLocalidade(estadoTrim, cidadeTrim)) {
+    throw erroValidacao('Cidade inválida para o estado selecionado.');
+  }
+  return { cidade: cidadeTrim, estado: estadoTrim };
+}
 
 async function listar() {
   const [rows] = await pool.query(`
@@ -64,11 +81,38 @@ async function buscarTelefone(id) {
   return rows[0]?.telefone || null;
 }
 
-async function criarMensagem(idAnuncio, dados) {
-  await pool.query(
-    'INSERT INTO mensagens (id_anuncio, nome, email, telefone, mensagem) VALUES (?, ?, ?, ?, ?)',
-    [idAnuncio, dados.nome, dados.email, dados.telefone || null, dados.mensagem]
-  );
+async function buscarFotos(id) {
+  try {
+    const [rows] = await pool.query(
+      'SELECT fotos FROM anuncios WHERE id_anuncio = ?',
+      [id]
+    );
+    if (!rows || rows.length === 0) return [];
+    const valor = rows[0].fotos;
+    if (!valor) return [];
+
+    // Tenta interpretar como JSON (array de objetos ou strings)
+    try {
+      const parseado = JSON.parse(valor);
+      if (Array.isArray(parseado)) {
+        return parseado.map(f => {
+          if (typeof f === 'string') return { url: f, legenda: '' };
+          if (f && typeof f === 'object') return { url: f.url || f.caminho || '', legenda: f.legenda || f.descricao || '' };
+          return { url: '', legenda: '' };
+        }).filter(f => f.url);
+      }
+      if (parseado && typeof parseado === 'object' && parseado.url) return [parseado];
+    } catch {
+      // Não é JSON, trata como texto separado por vírgula ou uma única URL
+      const urls = String(valor).split(',').map(u => u.trim()).filter(u => u);
+      return urls.map(url => ({ url, legenda: '' }));
+    }
+
+    return [];
+  } catch (erro) {
+    // Coluna fotos ainda não existe no banco; retorna vazio até a estrutura estar disponível.
+    return [];
+  }
 }
 
 async function categoriaId(nome) {
@@ -80,21 +124,23 @@ async function categoriaId(nome) {
 async function criar(usuarioId, dados) {
   const idCategoria = await categoriaId(dados.categoria);
   if (!idCategoria) throw new Error('Categoria não encontrada.');
+  const local = validarLocalidade(dados.cidade, dados.estado);
   const [result] = await pool.query(`
     INSERT INTO anuncios (id_usuario, id_categoria, titulo, descricao, preco, cidade, estado, ativo)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-  `, [usuarioId, idCategoria, dados.titulo, dados.descricao, dados.preco, dados.cidade, dados.estado, dados.ativo]);
+  `, [usuarioId, idCategoria, dados.titulo, dados.descricao, dados.preco, local.cidade, local.estado, dados.ativo]);
   return buscarPorId(result.insertId);
 }
 
 async function atualizar(id, usuarioId, dados) {
   const idCategoria = await categoriaId(dados.categoria);
   if (!idCategoria) throw new Error('Categoria não encontrada.');
+  const local = validarLocalidade(dados.cidade, dados.estado);
   const [result] = await pool.query(`
     UPDATE anuncios
     SET id_categoria = ?, titulo = ?, descricao = ?, preco = ?, cidade = ?, estado = ?, ativo = ?
     WHERE id_anuncio = ? AND id_usuario = ?
-  `, [idCategoria, dados.titulo, dados.descricao, dados.preco, dados.cidade, dados.estado, dados.ativo, id, usuarioId]);
+  `, [idCategoria, dados.titulo, dados.descricao, dados.preco, local.cidade, local.estado, dados.ativo, id, usuarioId]);
   if (!result.affectedRows) throw new Error('Este serviço não está disponível para edição.');
   return buscarPorId(id);
 }
@@ -107,4 +153,4 @@ async function excluir(id, usuarioId) {
   if (!result.affectedRows) throw new Error('Este serviço não está disponível para exclusão.');
 }
 
-module.exports = { listar, buscarPorId, criar, atualizar, excluir, buscarTelefone, criarMensagem };
+module.exports = { listar, buscarPorId, criar, atualizar, excluir, buscarTelefone, buscarFotos };

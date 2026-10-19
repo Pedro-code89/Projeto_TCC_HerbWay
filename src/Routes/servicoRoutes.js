@@ -9,8 +9,7 @@ router.get('/api/servicos/:id', servicoController.apiDetalhe);
 router.post('/api/servicos', servicoController.exigirLogin, servicoController.apiCriar);
 router.put('/api/servicos/:id', servicoController.exigirLogin, servicoController.apiAtualizar);
 router.delete('/api/servicos/:id', servicoController.exigirLogin, servicoController.apiExcluir);
-
-router.post('/api/servicos/:id/mensagens', servicoController.apiMensagem);
 router.get('/api/servicos/:id/telefone', servicoController.exigirLogin, servicoController.apiTelefone);
+router.get('/api/servicos/:id/fotos', servicoController.apiFotos);
 
 module.exports = router;

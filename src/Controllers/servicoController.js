@@ -30,24 +30,16 @@ async function apiExcluir(req, res) {
 
 async function apiTelefone(req, res) {
   const usuario = await require('../Models/usuarioModel').buscarPorId(req.session.usuarioId);
-  if (!usuario || !usuario.email_verificado) return res.status(403).json({ erro: 'Confirme seu e-mail para desbloquear telefones.' });
+  if (!usuario) return res.status(403).json({ erro: 'Faça login para desbloquear telefones.' });
   const servico = await servicoModel.buscarPorId(req.params.id);
   if (!servico) return res.status(404).json({ erro: 'Serviço não encontrado.' });
   const telefone = await servicoModel.buscarTelefone(req.params.id);
   res.json({ telefone });
 }
 
-async function apiMensagem(req, res) {
-  const nome = String(req.body.nome || '').trim();
-  const email = String(req.body.email || '').trim();
-  const telefone = String(req.body.telefone || '').trim();
-  const mensagem = String(req.body.mensagem || '').trim();
-  if (!nome || !email || !mensagem) return res.status(400).json({ erro: 'Preencha nome, e-mail e mensagem.' });
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ erro: 'E-mail inválido.' });
-  const servico = await servicoModel.buscarPorId(req.params.id);
-  if (!servico) return res.status(404).json({ erro: 'Serviço não encontrado.' });
-  await servicoModel.criarMensagem(req.params.id, { nome, email, telefone, mensagem });
-  res.status(201).json({ ok: true });
+async function apiFotos(req, res) {
+  const fotos = await servicoModel.buscarFotos(req.params.id);
+  res.json(fotos);
 }
 
-module.exports = { listar, detalhe, apiListar, apiDetalhe, exigirLogin, apiCriar, apiAtualizar, apiExcluir, apiTelefone, apiMensagem };
+module.exports = { listar, detalhe, apiListar, apiDetalhe, exigirLogin, apiCriar, apiAtualizar, apiExcluir, apiTelefone, apiFotos };

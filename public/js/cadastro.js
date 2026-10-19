@@ -8,7 +8,7 @@ formCadastro.addEventListener('submit', async evento => {
   try {
     const resposta = await HerbWay.cadastrar(formCadastro.elements.nome.value, formCadastro.elements.email.value, formCadastro.elements.senha.value);
     formCadastro.reset(); mostrarErro('erro-acesso', '');
-    mostrarAviso(resposta.mensagem || 'Cadastro realizado! Verifique seu e-mail.');
+    mostrarAviso(resposta.mensagem || 'Cadastro realizado com sucesso!');
     setTimeout(() => location.assign('/login'), 2500);
   } catch (erro) { mostrarErro('erro-acesso', erro.message); }
 });

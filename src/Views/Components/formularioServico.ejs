@@ -20,10 +20,17 @@
       aria-describedby="ajuda-preco">
     <small class="ajuda" id="ajuda-preco">Deixe vazio para combinar o valor.</small>
   </label>
-  <label>Cidade de atendimento<input name="cidade" required maxlength="60" placeholder="Ex.: Amparo"></label>
-  <label>Estado<select name="estado" required data-estados>
-      <option value="">Selecione</option>
-    </select></label>
+  <label>Estado
+    <select name="estado" required>
+      <option value="">Selecione um estado</option>
+    </select>
+  </label>
+  <label>Cidade de atendimento
+    <select name="cidade" required>
+      <option value="">Selecione primeiro o estado</option>
+    </select>
+    <p id="erro-cidade-servico" class="erro-form" role="alert" hidden></p>
+  </label>
   <label class="campo-inteiro">Descrição
     <textarea name="descricao" required minlength="10" maxlength="600" rows="4"
       placeholder="Descreva os cuidados que você oferece e o que está incluído no serviço."></textarea>

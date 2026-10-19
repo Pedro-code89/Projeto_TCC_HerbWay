@@ -31,12 +31,26 @@
     camposPerfil.forEach(campo => preencher('#dado-' + campo, proprio ? (campo === 'estado' ? (HerbWay.estados[fonte.estado] || 'Não informado') : (fonte[campo] || 'Não informado')) : ''));
   }
 
-  document.querySelector('#editar-perfil').addEventListener('click', () => {
+  document.querySelector('#editar-perfil').addEventListener('click', async () => {
     const perfil = HerbWay.conta();
     if (!perfil) return irParaLogin();
-    camposPerfil.forEach(campo => formPerfil.elements[campo].value = perfil[campo] || '');
+    if (typeof HerbWayLocalidade === 'undefined') {
+      mostrarErro('erro-perfil', 'Módulo de localidade não carregado. Recarregue a página.');
+      return;
+    }
+    // Define valores de texto/email/telefone etc. (não cidade/estado, que são selects dependentes)
+    camposPerfil.forEach(campo => {
+      if (campo !== 'cidade' && campo !== 'estado') formPerfil.elements[campo].value = perfil[campo] || '';
+    });
     fotoSelecionada = null; formPerfil.elements.foto.value = ''; document.querySelector('#preview-foto').hidden = true;
-    mostrarErro('erro-perfil', ''); modalPerfil.showModal();
+    mostrarErro('erro-perfil', '');
+    await HerbWayLocalidade.inicializarSelecaoLocalidade(formPerfil, {
+      estadoSelecaoInicial: perfil.estado || undefined,
+      cidadeSelecaoInicial: perfil.cidade || undefined,
+      cidadeObrigatorio: false,
+      msgErroCidade: '#erro-cidade-perfil'
+    });
+    modalPerfil.showModal();
   });
   formPerfil.addEventListener('submit', async evento => {
     evento.preventDefault();
@@ -176,16 +190,33 @@
   }
 
   function atualizarBotaoServico() { preencher('#salvar-servico', idEdicao ? 'Salvar alterações' : (formServico.elements.ativo.checked ? 'Publicar serviço' : 'Salvar como pausado')); }
-  function prepararServico(id = null) {
+  async function prepararServico(id = null) {
     const perfil = HerbWay.conta(); if (!perfil) return false;
     const servico = id ? HerbWay.ler().servicos.find(s => String(s.id) === String(id) && String(s.usuarioId) === String(perfil.id)) : null;
     if (id && !servico) { mostrarAviso('Este serviço não está disponível para edição.'); return false; }
+    if (typeof HerbWayLocalidade === 'undefined') {
+      mostrarErro('erro-servico', 'Módulo de localidade não carregado. Recarregue a página.');
+      return false;
+    }
     idEdicao = id; formServico.reset(); formServico.querySelectorAll('input, textarea').forEach(c => c.setCustomValidity(''));
     preencher('#titulo-servico', id ? 'Editar serviço' : 'Postar um serviço');
     preencher('#ajuda-servico', id ? 'Atualize as informações do seu anúncio.' : 'Conte o que você faz e encontre pessoas que precisam do seu cuidado.');
     document.querySelector('#excluir-servico').hidden = !id;
-    formServico.elements.cidade.value = perfil.cidade || ''; formServico.elements.estado.value = perfil.estado || '';
-    if (servico) { ['titulo','categoria','preco','cidade','estado','descricao'].forEach(c => formServico.elements[c].value = servico[c] ?? ''); formServico.elements.ativo.checked = Boolean(servico.ativo); }
+
+    // Seleção dependente estado -> cidade no formulário de serviço.
+    const estadoInicial = servico ? servico.estado : (perfil.estado || '');
+    const cidadeInicial = servico ? servico.cidade : (perfil.cidade || '');
+    await HerbWayLocalidade.inicializarSelecaoLocalidade(formServico, {
+      estadoSelecaoInicial: estadoInicial || undefined,
+      cidadeSelecaoInicial: cidadeInicial || undefined,
+      cidadeObrigatorio: true,
+      msgErroCidade: '#erro-cidade-servico'
+    });
+
+    if (servico) {
+      ['titulo','categoria','preco','descricao'].forEach(c => formServico.elements[c].value = servico[c] ?? '');
+      formServico.elements.ativo.checked = Boolean(servico.ativo);
+    }
     atualizarBotaoServico(); mostrarErro('erro-servico', ''); return true;
   }
   function abrirServico(id = null) { if (!prepararServico(id)) return; trocarAba('postar'); document.querySelector('#aba-postar').focus(); }
@@ -201,7 +232,7 @@
   });
   document.querySelector('#excluir-servico').addEventListener('click', async () => {
     if (!confirm('Excluir este anúncio? O histórico das contratações será mantido.')) return;
-    try { await HerbWay.excluirServico(idEdicao); prepararServico(); trocarAba('meus'); document.querySelector('#aba-meus').focus(); mostrarAviso('Anúncio excluído.'); }
+    try { await HerbWay.excluirServico(idEdicao); await prepararServico(); trocarAba('meus'); document.querySelector('#aba-meus').focus(); mostrarAviso('Anúncio excluído.'); }
     catch (erro) { mostrarErro('erro-servico', erro.message); }
   });
 
@@ -223,6 +254,6 @@
     mostrarPerfil(perfil, proprio, servicos); mostrarContratados(proprio ? dados.contratacoes.filter(c => String(c.usuarioId) === String(perfil.id)) : []); mostrarMeusServicos(proprio ? servicos : []); if (!proprio) mostrarPublicos(servicos);
   }
   window.addEventListener('herbway:atualizado', atualizar); window.addEventListener('pageshow', atualizar);
-  await atualizar(); prepararServico();
+  await atualizar(); await prepararServico();
   const parametros = new URLSearchParams(location.search); trocarAba(parametros.get('aba') || 'contratados', false); if (parametros.get('acao') === 'postar') abrirServico(); if (parametros.get('editar')) abrirServico(parametros.get('editar'));
 })();

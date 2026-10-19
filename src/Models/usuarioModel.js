@@ -1,4 +1,5 @@
 const { pool } = require('../Config/database');
+const localidadeService = require('../Services/localidadeService');
 
 async function listar() {
   const [rows] = await pool.query(`
@@ -47,21 +48,33 @@ async function atualizarSenha(id, senha) {
   await pool.query('UPDATE usuarios SET senha = ? WHERE id_usuario = ?', [hash, id]);
 }
 
-async function confirmarEmail(id) {
-  await pool.query('UPDATE usuarios SET email_verificado = 1 WHERE id_usuario = ?', [id]);
-}
-
 async function atualizar(id, campos) {
+  const cidade = campos.cidade ? String(campos.cidade).trim() : null;
+  const estado = campos.estado ? String(campos.estado).trim().toUpperCase() : null;
+
+  const erroValidacao = (mensagem) => {
+    const e = new Error(mensagem);
+    e.statusCode = 400;
+    return e;
+  };
+
+  if ((cidade && !estado) || (estado && !cidade)) {
+    throw erroValidacao('Informe tanto a cidade quanto o estado.');
+  }
+  if (cidade && estado && !localidadeService.validarLocalidade(estado, cidade)) {
+    throw erroValidacao('Cidade inválida para o estado selecionado.');
+  }
+
   const sql = `
     UPDATE usuarios
     SET nome = ?, email = ?, telefone = ?, cidade = ?, estado = ?, bairro = ?, sobre = ?, foto = ?
     WHERE id_usuario = ?
   `;
   await pool.query(sql, [
-    campos.nome, campos.email, campos.telefone || null, campos.cidade || null,
-    campos.estado || null, campos.bairro || null, campos.sobre || null, campos.foto || null, id
+    campos.nome, campos.email, campos.telefone || null, cidade || null,
+    estado || null, campos.bairro || null, campos.sobre || null, campos.foto || null, id
   ]);
   return buscarPorId(id);
 }
 
-module.exports = { listar, buscarPorId, buscarPorEmail, criar, atualizar, atualizarSenha, confirmarEmail };
+module.exports = { listar, buscarPorId, buscarPorEmail, criar, atualizar, atualizarSenha };

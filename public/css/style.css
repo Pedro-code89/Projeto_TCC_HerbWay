@@ -53,11 +53,6 @@
 .telefone-rotulo { font-size: 12px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--cinza); }
 .telefone-numero { font-size: 22px; font-weight: 700; letter-spacing: .5px; color: var(--texto); }
 .telefone-acoes { display: grid; gap: 8px; }
-.contato-card h2 { font-size: 20px; margin-bottom: 18px; }
-.sucesso-form { padding: 10px 12px; border-radius: 12px; background: var(--verde-claro); color: var(--verde-texto); font-size: 14px; }
-.coluna-lateral .formulario { grid-template-columns: 1fr; }
-.contato-card { padding: 34px; }
-.contato-card .formulario { gap: 18px; }
 .catalogo { padding-block: 40px; }
 .titulo-pagina { display: flex; align-items: center; justify-content: space-between; gap: 30px; }
 .titulo-pagina h1 { font-size: 34px; line-height: 1.2; max-width: 750px; }
@@ -69,7 +64,7 @@
 /* Detalhes */
 .pagina-detalhe { padding-block: 32px 48px; }
 .voltar { display: inline-block; color: var(--verde); margin-bottom: 26px; }
-.detalhe-grid { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 28px; align-items: start; }
+.detalhe-grid { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 28px; align-items: start; }
 .detalhe-principal, .profissional-card, .perfil-publico { padding: 34px; }
 .detalhe-principal h1 { font-size: 36px; line-height: 1.2; margin-block: 18px 12px; overflow-wrap: anywhere; }
 .detalhe-principal h2, .perfil-publico h2 { font-size: 21px; margin-bottom: 12px; }
@@ -88,7 +83,7 @@
 .publico-identidade .nota { margin-top: 8px; }
 
 /* Avaliações do serviço */
-.avaliacoes-servico { grid-column: 1; padding: 34px; }
+.avaliacoes-servico { grid-column: 1 / -1; padding: 34px; }
 .avaliacoes-servico h2 { font-size: 21px; margin-bottom: 16px; }
 .lista-avaliacoes { display: flex; flex-direction: column; gap: 14px; max-height: 260px; overflow-y: auto; overscroll-behavior: contain; padding-right: 10px; cursor: grab; scrollbar-width: thin; scrollbar-color: var(--scrollbar) var(--scrollbar-fundo); }
 .lista-avaliacoes:active, .lista-avaliacoes.arrastando { cursor: grabbing; }
@@ -102,6 +97,22 @@
 .avaliacao-comentario { margin-top: 8px; color: var(--texto-suave); line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
 .avaliacoes-servico .estado-vazio, #avaliacoes-vazio { font-size: 15px; }
 
+/* Fotos do serviço */
+.fotos-servico { padding: 34px; grid-column: 1 / -1; }
+.fotos-servico h2 { font-size: 21px; margin-bottom: 16px; }
+.lista-fotos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.lista-fotos img { width: 100%; height: 150px; object-fit: cover; border-radius: 8px; background: var(--superficie-2); border: 1px solid var(--borda); display: block; }
+.bloco-vazio {
+  background: var(--superficie-2);
+  border: 2px dashed var(--borda-forte);
+  border-radius: 12px;
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--cinza);
+  font-size: 15px;
+}
+.bloco-vazio span { display: block; }
+
 /* Responsividade */
 @media (max-width: 1000px) {
   .conteudo-inicial { grid-template-columns: minmax(0, 1fr) 220px; gap: 30px; }
@@ -109,10 +120,11 @@
   .introducao h1 { font-size: 34px; }
   .lista-servicos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .lista-carrossel .card-anuncio { flex-basis: calc((100% - 20px) / 2); }
-  .detalhe-grid { grid-template-columns: minmax(0, 1fr) 290px; gap: 20px; }
+  .detalhe-grid { grid-template-columns: minmax(0, 1fr) 260px; gap: 20px; }
   .detalhe-principal, .profissional-card, .perfil-publico { padding: 26px; }
-  .avaliacoes-servico { padding: 26px; }
-  .contato-card { padding: 26px; }
+  .avaliacoes-servico { padding: 26px; grid-column: 1 / -1; }
+  .fotos-servico { padding: 26px; grid-column: 1 / -1; }
+  .lista-fotos { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 700px) {
   .home, .catalogo { padding-top: 30px; }
@@ -135,4 +147,6 @@
   .publico-identidade { align-items: flex-start; flex-direction: column; gap: 20px; }
   .publico-identidade h1 { font-size: 28px; }
   .estado-vazio { padding: 30px 20px; }
+  .fotos-servico { padding: 20px; }
+  .lista-fotos { grid-template-columns: 1fr; }
 }

@@ -8,6 +8,7 @@ const usuarioRoutes = require('./src/Routes/usuarioRoutes');
 const servicoRoutes = require('./src/Routes/servicoRoutes');
 const contratacaoRoutes = require('./src/Routes/contratacaoRoutes');
 const apiRoutes = require('./src/Routes/apiRoutes');
+const localidadeRoutes = require('./src/Routes/localidadeRoutes');
 
 const app = express();
 const port = 3000;
@@ -29,11 +30,14 @@ app.use(usuarioRoutes);
 app.use(servicoRoutes);
 app.use(contratacaoRoutes);
 app.use(apiRoutes);
+app.use(localidadeRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err);
-  if (req.path.startsWith('/api/')) return res.status(500).json({ erro: 'Erro interno do servidor.' });
-  res.status(500).send('Erro interno do servidor.');
+  const status = err.statusCode || 500;
+  const mensagem = err.statusCode ? err.message : 'Erro interno do servidor.';
+  if (req.path.startsWith('/api/')) return res.status(status).json({ erro: mensagem });
+  res.status(status).send(mensagem);
 });
 
 testarConexao()

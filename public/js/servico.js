@@ -43,33 +43,40 @@
     catch { mostrarAviso('Não foi possível copiar.'); }
   });
 
-  // Formulário de contato com o profissional.
-  const formMensagem = document.querySelector('#form-mensagem');
-  formMensagem.addEventListener('submit', async evento => {
-    evento.preventDefault();
-    const nome = formMensagem.elements.nome.value.trim();
-    const email = formMensagem.elements.email.value.trim();
-    const telefone = formMensagem.elements.telefone.value.trim();
-    const mensagem = formMensagem.elements.mensagem.value.trim();
-    document.querySelector('#sucesso-mensagem').hidden = true;
-    if (!nome || !email || !mensagem) { mostrarErro('erro-mensagem', 'Preencha nome, e-mail e mensagem.'); return; }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { mostrarErro('erro-mensagem', 'Informe um e-mail válido.'); return; }
-    mostrarErro('erro-mensagem', '');
-    const botaoEnviar = document.querySelector('#enviar-mensagem');
-    botaoEnviar.disabled = true; botaoEnviar.textContent = 'Enviando...';
+  // Fotos do serviço: carrega da API e exibe na grade, ou mostra "Sem fotos".
+  const secaoFotos = document.querySelector('#fotos-servico');
+  const listaFotos = document.querySelector('#lista-fotos');
+  const avisoSemFotos = document.querySelector('#sem-fotos');
+
+  async function carregarFotos() {
     try {
-      const resposta = await fetch('/api/servicos/' + encodeURIComponent(servicoAtual.id) + '/mensagens', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nome, email, telefone, mensagem })
-      });
-      const corpo = await resposta.json().catch(() => ({}));
-      if (!resposta.ok) throw new Error(corpo.erro || 'Não foi possível enviar a mensagem.');
-      document.querySelector('#sucesso-mensagem').hidden = false;
-      formMensagem.reset();
-      formMensagem.elements.mensagem.value = 'Olá, tenho interesse no seu serviço. Poderia me passar mais informações?';
-    } catch (erro) { mostrarErro('erro-mensagem', erro.message); }
-    finally { botaoEnviar.disabled = false; botaoEnviar.textContent = 'Enviar mensagem'; }
-  });
+      const resposta = await fetch('/api/servicos/' + encodeURIComponent(servicoAtual.id) + '/fotos');
+      const fotos = await resposta.json().catch(() => []);
+      if (fotos && fotos.length > 0) {
+        secaoFotos.hidden = false;
+        avisoSemFotos.hidden = true;
+        listaFotos.hidden = false;
+        fotos.forEach(foto => {
+          const img = document.createElement('img');
+          img.src = foto.url;
+          img.alt = foto.legenda || 'Foto do serviço';
+          img.loading = 'lazy';
+          listaFotos.appendChild(img);
+        });
+      } else {
+        secaoFotos.hidden = false;
+        avisoSemFotos.hidden = false;
+        listaFotos.hidden = true;
+      }
+    } catch (erro) {
+      secaoFotos.hidden = false;
+      avisoSemFotos.hidden = false;
+      listaFotos.hidden = true;
+      console.error('[Fotos] Falha ao carregar fotos:', erro);
+    }
+  }
+
+  carregarFotos();
 
   // Avaliações deste anúncio (mais recentes primeiro), empilhadas com rolagem própria.
   const avaliacoes = (HerbWay.ler().avaliacoes || []).filter(item => String(item.servicoId) === String(servicoAtual.id));
