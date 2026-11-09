@@ -48,6 +48,15 @@ function mostrarCatalogo(servicos) {
 
     HerbWay.aplicarAvatar(card.querySelector('.avatar-pequeno'), { nome, foto: servico.foto });
 
+    const imgCapa = card.querySelector('[data-campo-capa]');
+    const placeholderCapa = card.querySelector('.anuncio-capa-placeholder');
+    if (servico.capa && imgCapa) {
+      imgCapa.src = servico.capa;
+      imgCapa.alt = `Foto do serviço ${campos.titulo}`;
+      imgCapa.hidden = false;
+      if (placeholderCapa) placeholderCapa.hidden = true;
+    }
+
     card.querySelectorAll('[data-link="servico"]').forEach(link => {
       link.href = '/servicos/' + encodeURIComponent(servico.id);
     });

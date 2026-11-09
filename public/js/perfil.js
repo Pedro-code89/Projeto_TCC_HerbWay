@@ -13,6 +13,10 @@
   let idContratacao = null;
   let notaSelecionada = 0;
   let fotoSelecionada = null;
+  let fotosServico = [];
+  const MAX_FOTOS_SERVICO = 6;
+  const MAX_BYTES_FOTO_SERVICO = 2 * 1024 * 1024;
+  const TIPOS_FOTO_SERVICO = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
   const preencher = (seletor, valor) => document.querySelector(seletor).textContent = valor ?? '';
 
@@ -29,6 +33,16 @@
     preencher('#descricao-publica', perfil.sobre || 'Este perfil ainda não adicionou uma descrição.');
     const fonte = proprio && HerbWay.conta() ? HerbWay.conta() : perfil;
     camposPerfil.forEach(campo => preencher('#dado-' + campo, proprio ? (campo === 'estado' ? (HerbWay.estados[fonte.estado] || 'Não informado') : (fonte[campo] || 'Não informado')) : ''));
+    const perfilMapa = perfil || fonte;
+    if (window.HerbWayMapa) HerbWayMapa.renderizarMapaAproximado('mapa-perfil', perfilMapa.latitude, perfilMapa.longitude, 'mapa-perfil-indisponivel');
+    const btnVis = document.querySelector('#btn-visualizacoes-perfil');
+    if (btnVis && !btnVis.dataset.bindVis) {
+      btnVis.dataset.bindVis = '1';
+      btnVis.addEventListener('click', () => {
+        const conta = HerbWay.conta();
+        if (conta) window.HerbWayVisualizacoes?.abrir('modal-visualizacoes-perfil', 'perfil', conta.id);
+      });
+    }
   }
 
   document.querySelector('#editar-perfil').addEventListener('click', async () => {
@@ -189,6 +203,57 @@
     });
   }
 
+  function renderizarFotosServico() {
+    const grade = document.querySelector('#preview-fotos-servico');
+    if (!grade) return;
+    grade.replaceChildren();
+    fotosServico.forEach((foto, indice) => {
+      const item = document.createElement('div');
+      item.className = 'foto-preview-item';
+      const img = document.createElement('img');
+      img.src = foto.dataUrl || foto.url;
+      img.alt = `Foto ${indice + 1} do serviço`;
+      img.loading = 'lazy';
+      const remover = document.createElement('button');
+      remover.type = 'button';
+      remover.className = 'foto-preview-remover';
+      remover.setAttribute('aria-label', `Remover foto ${indice + 1}`);
+      remover.textContent = '×';
+      remover.addEventListener('click', () => { fotosServico.splice(indice, 1); renderizarFotosServico(); });
+      item.append(img, remover);
+      if (indice === 0) {
+        const capa = document.createElement('span');
+        capa.className = 'foto-preview-capa';
+        capa.textContent = 'Capa';
+        item.append(capa);
+      }
+      grade.append(item);
+    });
+  }
+
+  function lerArquivoComoDataUrl(arquivo) {
+    return new Promise((resolve, reject) => {
+      const leitor = new FileReader();
+      leitor.onload = () => resolve(leitor.result);
+      leitor.onerror = () => reject(new Error('Não foi possível ler a imagem.'));
+      leitor.readAsDataURL(arquivo);
+    });
+  }
+
+  const inputFotosServico = document.querySelector('#fotos-servico');
+  inputFotosServico?.addEventListener('change', async () => {
+    const arquivos = [...(inputFotosServico.files || [])];
+    inputFotosServico.value = '';
+    for (const arquivo of arquivos) {
+      if (fotosServico.length >= MAX_FOTOS_SERVICO) { mostrarErro('erro-servico', `Você pode adicionar no máximo ${MAX_FOTOS_SERVICO} imagens.`); break; }
+      if (!TIPOS_FOTO_SERVICO.includes(arquivo.type)) { mostrarErro('erro-servico', 'Use apenas imagens JPG, PNG, WEBP ou GIF.'); continue; }
+      if (arquivo.size > MAX_BYTES_FOTO_SERVICO) { mostrarErro('erro-servico', `A imagem "${arquivo.name}" excede 2 MB.`); continue; }
+      try { fotosServico.push({ dataUrl: await lerArquivoComoDataUrl(arquivo) }); }
+      catch (e) { mostrarErro('erro-servico', e.message); }
+    }
+    renderizarFotosServico();
+  });
+
   function atualizarBotaoServico() { preencher('#salvar-servico', idEdicao ? 'Salvar alterações' : (formServico.elements.ativo.checked ? 'Publicar serviço' : 'Salvar como pausado')); }
   async function prepararServico(id = null) {
     const perfil = HerbWay.conta(); if (!perfil) return false;
@@ -199,6 +264,8 @@
       return false;
     }
     idEdicao = id; formServico.reset(); formServico.querySelectorAll('input, textarea').forEach(c => c.setCustomValidity(''));
+    fotosServico = servico && Array.isArray(servico.fotosLista) ? servico.fotosLista.map(f => ({ url: f.url, legenda: f.legenda || '' })) : [];
+    renderizarFotosServico();
     preencher('#titulo-servico', id ? 'Editar serviço' : 'Postar um serviço');
     preencher('#ajuda-servico', id ? 'Atualize as informações do seu anúncio.' : 'Conte o que você faz e encontre pessoas que precisam do seu cuidado.');
     document.querySelector('#excluir-servico').hidden = !id;
@@ -219,15 +286,23 @@
     }
     atualizarBotaoServico(); mostrarErro('erro-servico', ''); return true;
   }
-  function abrirServico(id = null) { if (!prepararServico(id)) return; trocarAba('postar'); document.querySelector('#aba-postar').focus(); }
+  async function abrirServico(id = null) { if (!await prepararServico(id)) return; trocarAba('postar'); document.querySelector('#aba-postar').focus(); }
   document.querySelectorAll('[data-novo-servico]').forEach(b => b.addEventListener('click', () => abrirServico()));
   formServico.elements.ativo.addEventListener('change', atualizarBotaoServico);
-  document.querySelector('#cancelar-servico').addEventListener('click', () => { prepararServico(); trocarAba('meus'); document.querySelector('#aba-meus').focus(); });
+  document.querySelector('#cancelar-servico').addEventListener('click', async () => { await prepararServico(); trocarAba('meus'); document.querySelector('#aba-meus').focus(); });
   formServico.addEventListener('submit', async evento => {
     evento.preventDefault(); if (!validarFormulario(formServico)) return;
     const campos = {}; ['titulo','categoria','cidade','estado','descricao'].forEach(c => campos[c] = formServico.elements[c].value.trim());
     campos.preco = formServico.elements.preco.value === '' ? null : Number(formServico.elements.preco.value); campos.ativo = formServico.elements.ativo.checked;
-    try { await HerbWay.salvarServico(campos, idEdicao); prepararServico(); trocarAba('meus'); document.querySelector('#aba-meus').focus(); mostrarAviso(campos.ativo ? 'Serviço salvo e disponível no dashboard.' : 'Serviço salvo como pausado.'); }
+    campos.fotos = fotosServico.map(f => f.dataUrl ? { dataUrl: f.dataUrl, legenda: f.legenda || '' } : { url: f.url, legenda: f.legenda || '' });
+    try {
+      const salvo = await HerbWay.salvarServico(campos, idEdicao);
+      if (campos.fotos.length > 0 && !(salvo && (salvo.capa || (Array.isArray(salvo.fotosLista) && salvo.fotosLista.length)))) {
+        mostrarErro('erro-servico', 'O serviço foi salvo, mas as fotos não foram registradas. Confira se o servidor foi reiniciado após as alterações, se a pasta do projeto permite escrita em public/uploads e se não há erro no terminal do Node.');
+        return;
+      }
+      await prepararServico(); trocarAba('meus'); document.querySelector('#aba-meus').focus(); mostrarAviso(campos.ativo ? 'Serviço salvo e disponível no dashboard.' : 'Serviço salvo como pausado.');
+    }
     catch (erro) { mostrarErro('erro-servico', erro.message); }
   });
   document.querySelector('#excluir-servico').addEventListener('click', async () => {

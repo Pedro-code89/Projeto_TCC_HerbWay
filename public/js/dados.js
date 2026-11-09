@@ -50,9 +50,10 @@ window.HerbWay = (() => {
     },
     async salvarServico(campos, id) {
       const url = id ? '/api/servicos/' + encodeURIComponent(id) : '/api/servicos';
-      await requisicao(url, { method: id ? 'PUT' : 'POST', body: JSON.stringify(campos) });
+      const salvo = await requisicao(url, { method: id ? 'PUT' : 'POST', body: JSON.stringify(campos) });
       await carregar();
       window.dispatchEvent(new Event('herbway:atualizado'));
+      return salvo;
     },
     async excluirServico(id) {
       await requisicao('/api/servicos/' + encodeURIComponent(id), { method: 'DELETE' });

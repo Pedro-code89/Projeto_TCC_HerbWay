@@ -4,6 +4,13 @@
   aria-label="Serviços disponíveis"></div>
 <template id="modelo-anuncio">
   <article class="card-anuncio">
+    <a class="anuncio-capa" data-link="servico" aria-label="Ver serviço">
+      <img data-campo-capa alt="" loading="lazy" hidden>
+      <span class="anuncio-capa-placeholder" aria-hidden="true">
+        <svg class="icone"><use href="#icone-planta"></use></svg>
+        <span>Sem foto</span>
+      </span>
+    </a>
     <div class="anuncio-etiquetas"><span class="categoria" data-campo="categoria"></span><span class="nota"
         data-campo="avaliacao"></span></div>
     <h3><a data-link="servico" data-campo="titulo"></a></h3>

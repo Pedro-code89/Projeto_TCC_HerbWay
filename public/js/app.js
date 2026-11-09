@@ -96,3 +96,90 @@ HerbWay.pronto.then(() => {
 }).catch(erro => console.error('Erro ao carregar dados:', erro));
 window.addEventListener('pageshow', atualizarCabecalho);
 window.addEventListener('herbway:atualizado', atualizarCabecalho);
+
+// Visualizações (proprietário): painel com totais por período e visitantes.
+(function () {
+  function iniciais(nome) {
+    return String(nome || '?').trim().split(/\s+/).slice(0, 2).map(p => p[0]).join('').toUpperCase();
+  }
+  function formatarData(valor) {
+    if (!valor) return '';
+    const d = valor instanceof Date ? valor : new Date(valor);
+    if (Number.isNaN(d.getTime())) return String(valor).slice(0, 16).replace('T', ' ');
+    return d.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+  }
+  async function carregar(tipo, id, periodo) {
+    const base = tipo === 'perfil' ? '/api/usuarios/' : '/api/servicos/';
+    const resp = await fetch(base + encodeURIComponent(id) + '/visualizacoes?periodo=' + encodeURIComponent(periodo));
+    const corpo = await resp.json().catch(() => ({}));
+    if (!resp.ok) throw new Error(corpo.erro || 'Não foi possível carregar as visualizações.');
+    return corpo;
+  }
+  function renderVisitantes(lista, ul) {
+    ul.replaceChildren();
+    if (!lista || !lista.length) {
+      const li = document.createElement('li');
+      li.className = 'texto-cinza';
+      li.textContent = 'Nenhuma visualização registrada neste período.';
+      ul.append(li);
+      return;
+    }
+    lista.forEach(v => {
+      const li = document.createElement('li');
+      li.className = 'visualizacao-visitante';
+      const avatar = document.createElement('a');
+      avatar.href = '/profissional/' + encodeURIComponent(v.id);
+      avatar.className = 'avatar-pequeno visualizacao-avatar';
+      avatar.setAttribute('aria-label', 'Ver perfil de ' + (v.nome || 'usuário'));
+      if (v.foto) { const img = document.createElement('img'); img.src = v.foto; img.alt = ''; avatar.append(img); }
+      else { avatar.textContent = iniciais(v.nome); }
+      const info = document.createElement('div');
+      info.className = 'visualizacao-info';
+      const nome = document.createElement('a');
+      nome.href = '/profissional/' + encodeURIComponent(v.id);
+      nome.className = 'link-verde';
+      nome.textContent = v.nome || 'Usuário';
+      const data = document.createElement('span');
+      data.className = 'texto-cinza';
+      data.textContent = 'Última visualização: ' + formatarData(v.ultimaVisualizacao);
+      info.append(nome, data);
+      li.append(avatar, info);
+      ul.append(li);
+    });
+  }
+  async function abrir(dialogId, tipo, id) {
+    const dialog = document.getElementById(dialogId);
+    if (!dialog) return;
+    const totalEl = dialog.querySelector('[data-vis-total]');
+    const pessoasEl = dialog.querySelector('[data-vis-pessoas]');
+    const anonEl = dialog.querySelector('[data-vis-anonimos]');
+    const listaEl = dialog.querySelector('[data-vis-lista]');
+    const statusEl = dialog.querySelector('[data-vis-status]');
+    const botoes = [...dialog.querySelectorAll('[data-periodo-vis]')];
+    let periodo = 'total';
+    async function atualizar() {
+      botoes.forEach(b => { const on = b.dataset.periodoVis === periodo; b.classList.toggle('ativa', on); b.setAttribute('aria-pressed', String(on)); });
+      if (statusEl) { statusEl.hidden = false; statusEl.textContent = 'Carregando...'; }
+      if (listaEl) listaEl.replaceChildren();
+      try {
+        const d = await carregar(tipo, id, periodo);
+        if (totalEl) totalEl.textContent = String(d.total ?? 0);
+        if (pessoasEl) pessoasEl.textContent = String(d.pessoas ?? 0);
+        if (anonEl) anonEl.textContent = d.anonimos ? ` (inclui ${d.anonimos} visita(s) sem conta)` : '';
+        if (d.indisponivel) {
+          if (statusEl) { statusEl.hidden = false; statusEl.textContent = 'Registro de visualizações indisponível no banco. Execute database-migration-visualizacoes.sql e reinicie o servidor.'; }
+          if (listaEl) listaEl.replaceChildren();
+        } else {
+          if (statusEl) statusEl.hidden = true;
+          if (listaEl) renderVisitantes(d.visitantes, listaEl);
+        }
+      } catch (e) {
+        if (statusEl) { statusEl.hidden = false; statusEl.textContent = e.message; }
+      }
+    }
+    botoes.forEach(b => b.onclick = () => { periodo = b.dataset.periodoVis; atualizar(); });
+    dialog.showModal();
+    atualizar();
+  }
+  window.HerbWayVisualizacoes = { abrir };
+})();

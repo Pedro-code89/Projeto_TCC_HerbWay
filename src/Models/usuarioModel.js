@@ -1,29 +1,74 @@
 const { pool } = require('../Config/database');
 const localidadeService = require('../Services/localidadeService');
+const { coordenadaPublica } = require('../Services/geocodingService');
+
+function colunaAusente(erro) {
+  return erro && (erro.code === 'ER_BAD_FIELD_ERROR' || /Unknown column/i.test(String(erro.message || '')));
+}
+
+function publicoUsuario(row) {
+  if (!row) return null;
+  return { ...row, latitude: coordenadaPublica(row.latitude), longitude: coordenadaPublica(row.longitude) };
+}
 
 async function listar() {
-  const [rows] = await pool.query(`
-    SELECT u.id_usuario AS id, u.nome, u.email, u.telefone, u.cidade, u.estado, u.bairro, u.sobre, u.foto, u.email_verificado,
-           COALESCE(ROUND(AVG(a.nota), 1), 0) AS avaliacao,
-           COUNT(a.id_avaliacao) AS avaliacoes
-    FROM usuarios u
-    LEFT JOIN avaliacoes a ON a.id_profissional = u.id_usuario
-    GROUP BY u.id_usuario
-    ORDER BY u.nome
-  `);
-  return rows;
+  let rows;
+  try {
+    [rows] = await pool.query(`
+      SELECT u.id_usuario AS id, u.nome, u.email, u.telefone, u.cidade, u.estado, u.bairro, u.sobre, u.foto, u.email_verificado,
+             u.latitude, u.longitude,
+             COALESCE(ROUND(AVG(a.nota), 1), 0) AS avaliacao,
+             COUNT(a.id_avaliacao) AS avaliacoes
+      FROM usuarios u
+      LEFT JOIN avaliacoes a ON a.id_profissional = u.id_usuario
+      GROUP BY u.id_usuario
+      ORDER BY u.nome
+    `);
+  } catch (erro) {
+    if (!colunaAusente(erro)) throw erro;
+    [rows] = await pool.query(`
+      SELECT u.id_usuario AS id, u.nome, u.email, u.telefone, u.cidade, u.estado, u.bairro, u.sobre, u.foto, u.email_verificado,
+             COALESCE(ROUND(AVG(a.nota), 1), 0) AS avaliacao,
+             COUNT(a.id_avaliacao) AS avaliacoes
+      FROM usuarios u
+      LEFT JOIN avaliacoes a ON a.id_profissional = u.id_usuario
+      GROUP BY u.id_usuario
+      ORDER BY u.nome
+    `);
+  }
+  return rows.map(publicoUsuario);
 }
 
 async function buscarPorId(id) {
-  const [rows] = await pool.query(`
-    SELECT u.id_usuario AS id, u.nome, u.email, u.telefone, u.cidade, u.estado, u.bairro, u.sobre, u.foto, u.email_verificado,
-           COALESCE(ROUND(AVG(a.nota), 1), 0) AS avaliacao,
-           COUNT(a.id_avaliacao) AS avaliacoes
-    FROM usuarios u
-    LEFT JOIN avaliacoes a ON a.id_profissional = u.id_usuario
-    WHERE u.id_usuario = ?
-    GROUP BY u.id_usuario
-  `, [id]);
+  let rows;
+  try {
+    [rows] = await pool.query(`
+      SELECT u.id_usuario AS id, u.nome, u.email, u.telefone, u.cidade, u.estado, u.bairro, u.sobre, u.foto, u.email_verificado,
+             u.latitude, u.longitude,
+             COALESCE(ROUND(AVG(a.nota), 1), 0) AS avaliacao,
+             COUNT(a.id_avaliacao) AS avaliacoes
+      FROM usuarios u
+      LEFT JOIN avaliacoes a ON a.id_profissional = u.id_usuario
+      WHERE u.id_usuario = ?
+      GROUP BY u.id_usuario
+    `, [id]);
+  } catch (erro) {
+    if (!colunaAusente(erro)) throw erro;
+    [rows] = await pool.query(`
+      SELECT u.id_usuario AS id, u.nome, u.email, u.telefone, u.cidade, u.estado, u.bairro, u.sobre, u.foto, u.email_verificado,
+             COALESCE(ROUND(AVG(a.nota), 1), 0) AS avaliacao,
+             COUNT(a.id_avaliacao) AS avaliacoes
+      FROM usuarios u
+      LEFT JOIN avaliacoes a ON a.id_profissional = u.id_usuario
+      WHERE u.id_usuario = ?
+      GROUP BY u.id_usuario
+    `, [id]);
+  }
+  return publicoUsuario(rows[0]);
+}
+
+async function buscarPorIdInterno(id) {
+  const [rows] = await pool.query('SELECT * FROM usuarios WHERE id_usuario = ?', [id]);
   return rows[0] || null;
 }
 
@@ -51,6 +96,10 @@ async function atualizarSenha(id, senha) {
 async function atualizar(id, campos) {
   const cidade = campos.cidade ? String(campos.cidade).trim() : null;
   const estado = campos.estado ? String(campos.estado).trim().toUpperCase() : null;
+  const bairro = campos.bairro ? String(campos.bairro).trim() : null;
+  const temCoords = Object.prototype.hasOwnProperty.call(campos, 'latitude') || Object.prototype.hasOwnProperty.call(campos, 'longitude');
+  const latitude = temCoords ? (campos.latitude ?? null) : undefined;
+  const longitude = temCoords ? (campos.longitude ?? null) : undefined;
 
   const erroValidacao = (mensagem) => {
     const e = new Error(mensagem);
@@ -65,16 +114,28 @@ async function atualizar(id, campos) {
     throw erroValidacao('Cidade inválida para o estado selecionado.');
   }
 
-  const sql = `
-    UPDATE usuarios
-    SET nome = ?, email = ?, telefone = ?, cidade = ?, estado = ?, bairro = ?, sobre = ?, foto = ?
-    WHERE id_usuario = ?
-  `;
-  await pool.query(sql, [
-    campos.nome, campos.email, campos.telefone || null, cidade || null,
-    estado || null, campos.bairro || null, campos.sobre || null, campos.foto || null, id
-  ]);
+  if (temCoords) {
+    try {
+      await pool.query(
+        `UPDATE usuarios
+         SET nome = ?, email = ?, telefone = ?, cidade = ?, estado = ?, bairro = ?, sobre = ?, foto = ?, latitude = ?, longitude = ?
+         WHERE id_usuario = ?`,
+        [campos.nome, campos.email, campos.telefone || null, cidade || null, estado || null, bairro || null, campos.sobre || null, campos.foto || null, latitude, longitude, id]
+      );
+    } catch (erro) {
+      if (!colunaAusente(erro)) throw erro;
+      await pool.query(
+        `UPDATE usuarios SET nome = ?, email = ?, telefone = ?, cidade = ?, estado = ?, bairro = ?, sobre = ?, foto = ? WHERE id_usuario = ?`,
+        [campos.nome, campos.email, campos.telefone || null, cidade || null, estado || null, bairro || null, campos.sobre || null, campos.foto || null, id]
+      );
+    }
+  } else {
+    await pool.query(
+      `UPDATE usuarios SET nome = ?, email = ?, telefone = ?, cidade = ?, estado = ?, bairro = ?, sobre = ?, foto = ? WHERE id_usuario = ?`,
+      [campos.nome, campos.email, campos.telefone || null, cidade || null, estado || null, bairro || null, campos.sobre || null, campos.foto || null, id]
+    );
+  }
   return buscarPorId(id);
 }
 
-module.exports = { listar, buscarPorId, buscarPorEmail, criar, atualizar, atualizarSenha };
+module.exports = { listar, buscarPorId, buscarPorIdInterno, buscarPorEmail, criar, atualizar, atualizarSenha };

@@ -1,5 +1,7 @@
 const usuarioModel = require('../Models/usuarioModel');
 const bcrypt = require('bcryptjs');
+const { geocodificarLocalizacao, localizacaoMudou } = require('../Services/geocodingService');
+const visualizacaoModel = require('../Models/visualizacaoModel');
 
 const tentativas = new Map();
 function limitado(chave, max = 3, janelaMs = 10 * 60 * 1000) {
@@ -16,6 +18,11 @@ function perfil(req, res) {
   res.render('Pages/perfil', { pagina: 'perfil', perfilId: '' });
 }
 function profissional(req, res) {
+  visualizacaoModel.registrarPerfil({
+    alvoId: req.params.id,
+    visualizadorId: req.session.usuarioId,
+    sessaoId: req.sessionID
+  }).catch(() => {});
   res.render('Pages/profissional', { pagina: 'servicos', id: req.params.id });
 }
 
@@ -51,7 +58,19 @@ async function apiAtualizarPerfil(req, res) {
   const outro = await usuarioModel.buscarPorEmail(email);
   if (outro && outro.id_usuario !== req.session.usuarioId) return res.status(409).json({ erro: 'Este e-mail já está em outro perfil.' });
   const atual = await usuarioModel.buscarPorId(req.session.usuarioId);
-  const usuario = await usuarioModel.atualizar(req.session.usuarioId, { ...req.body, email, foto: req.body.foto === undefined ? atual.foto : (req.body.foto || null) });
+  const dados = { ...req.body, email, foto: req.body.foto === undefined ? atual.foto : (req.body.foto || null) };
+  const semCoords = !(atual && atual.latitude != null && atual.longitude != null);
+  if (localizacaoMudou(atual, dados) || (semCoords && String(dados.cidade || '').trim() && String(dados.estado || '').trim())) {
+    if (String(dados.cidade || '').trim() && String(dados.estado || '').trim()) {
+      const coords = await geocodificarLocalizacao({ bairro: dados.bairro, cidade: dados.cidade, estado: dados.estado });
+      dados.latitude = coords ? coords.latitude : null;
+      dados.longitude = coords ? coords.longitude : null;
+    } else {
+      dados.latitude = null;
+      dados.longitude = null;
+    }
+  }
+  const usuario = await usuarioModel.atualizar(req.session.usuarioId, dados);
   res.json(usuario);
 }
 

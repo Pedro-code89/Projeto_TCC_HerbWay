@@ -1,5 +1,7 @@
 const { pool } = require('../Config/database');
 const localidadeService = require('../Services/localidadeService');
+const { parsearFotos } = require('../Services/imagemService');
+const { coordenadaPublica } = require('../Services/geocodingService');
 
 function validarLocalidade(cidade, estado) {
   const erroValidacao = (mensagem) => {
@@ -17,32 +19,84 @@ function validarLocalidade(cidade, estado) {
   return { cidade: cidadeTrim, estado: estadoTrim };
 }
 
+function colunaFotosAusente(erro) {
+  return erro && (erro.code === 'ER_BAD_FIELD_ERROR' || /Unknown column/i.test(String(erro.message || '')));
+}
+
+function comCapa(rows) {
+  rows.forEach(r => {
+    const fotos = parsearFotos(r.fotos);
+    r.capa = fotos.length ? fotos[0].url : null;
+    r.fotosLista = fotos;
+    delete r.fotos;
+    r.latitude = coordenadaPublica(r.latitude);
+    r.longitude = coordenadaPublica(r.longitude);
+  });
+  return rows;
+}
+
 async function listar() {
-  const [rows] = await pool.query(`
-    SELECT an.id_anuncio AS id,
-           an.id_usuario AS usuarioId,
-           an.id_categoria AS categoriaId,
-           an.titulo AS titulo,
-           an.descricao,
-           an.preco,
-           an.cidade,
-           an.estado,
-           an.ativo,
-           c.nome AS categoria,
-           u.nome AS nome,
-           u.telefone,
-           u.bairro,
-           u.sobre,
-           COALESCE(ROUND(AVG(av.nota), 1), 0) AS avaliacao,
-           COUNT(av.id_avaliacao) AS avaliacoes
-    FROM anuncios an
-    INNER JOIN usuarios u ON u.id_usuario = an.id_usuario
-    INNER JOIN categorias c ON c.id_categoria = an.id_categoria
-    LEFT JOIN avaliacoes av ON av.id_anuncio = an.id_anuncio
-    GROUP BY an.id_anuncio
-    ORDER BY an.id_anuncio DESC
-  `);
-  return mascarar(rows);
+  let rows;
+  try {
+    [rows] = await pool.query(`
+      SELECT an.id_anuncio AS id,
+             an.id_usuario AS usuarioId,
+             an.id_categoria AS categoriaId,
+             an.titulo AS titulo,
+             an.descricao,
+             an.preco,
+             an.cidade,
+             an.estado,
+             an.ativo,
+             an.fotos,
+             an.latitude,
+             an.longitude,
+             c.nome AS categoria,
+             u.nome AS nome,
+             u.telefone,
+             u.bairro,
+             u.sobre,
+             u.foto,
+             COALESCE(ROUND(AVG(av.nota), 1), 0) AS avaliacao,
+             COUNT(av.id_avaliacao) AS avaliacoes
+      FROM anuncios an
+      INNER JOIN usuarios u ON u.id_usuario = an.id_usuario
+      INNER JOIN categorias c ON c.id_categoria = an.id_categoria
+      LEFT JOIN avaliacoes av ON av.id_anuncio = an.id_anuncio
+      GROUP BY an.id_anuncio
+      ORDER BY an.id_anuncio DESC
+    `);
+  } catch (erro) {
+    if (!colunaFotosAusente(erro)) throw erro;
+    [rows] = await pool.query(`
+      SELECT an.id_anuncio AS id,
+             an.id_usuario AS usuarioId,
+             an.id_categoria AS categoriaId,
+             an.titulo AS titulo,
+             an.descricao,
+             an.preco,
+             an.cidade,
+             an.estado,
+             an.ativo,
+             an.latitude,
+             an.longitude,
+             c.nome AS categoria,
+             u.nome AS nome,
+             u.telefone,
+             u.bairro,
+             u.sobre,
+             u.foto,
+             COALESCE(ROUND(AVG(av.nota), 1), 0) AS avaliacao,
+             COUNT(av.id_avaliacao) AS avaliacoes
+      FROM anuncios an
+      INNER JOIN usuarios u ON u.id_usuario = an.id_usuario
+      INNER JOIN categorias c ON c.id_categoria = an.id_categoria
+      LEFT JOIN avaliacoes av ON av.id_anuncio = an.id_anuncio
+      GROUP BY an.id_anuncio
+      ORDER BY an.id_anuncio DESC
+    `);
+  }
+  return comCapa(mascarar(rows));
 }
 
 function mascarar(rows) {
@@ -54,23 +108,51 @@ function mascarar(rows) {
 }
 
 async function buscarPorId(id) {
-  const [rows] = await pool.query(`
-    SELECT an.id_anuncio AS id,
-           an.id_usuario AS usuarioId,
-           an.id_categoria AS categoriaId,
-           an.titulo, an.descricao, an.preco, an.cidade, an.estado, an.ativo,
-           c.nome AS categoria,
-           u.nome AS nome, u.telefone, u.bairro, u.sobre,
-           COALESCE(ROUND(AVG(av.nota), 1), 0) AS avaliacao,
-           COUNT(av.id_avaliacao) AS avaliacoes
-    FROM anuncios an
-    INNER JOIN usuarios u ON u.id_usuario = an.id_usuario
-    INNER JOIN categorias c ON c.id_categoria = an.id_categoria
-    LEFT JOIN avaliacoes av ON av.id_anuncio = an.id_anuncio
-    WHERE an.id_anuncio = ?
-    GROUP BY an.id_anuncio
-  `, [id]);
-  return rows[0] ? mascarar(rows)[0] : null;
+  let rows;
+  try {
+    [rows] = await pool.query(`
+      SELECT an.id_anuncio AS id,
+             an.id_usuario AS usuarioId,
+             an.id_categoria AS categoriaId,
+             an.titulo, an.descricao, an.preco, an.cidade, an.estado, an.ativo,
+             an.fotos,
+             an.latitude,
+             an.longitude,
+             c.nome AS categoria,
+             u.nome AS nome, u.telefone, u.bairro, u.sobre, u.foto,
+             COALESCE(ROUND(AVG(av.nota), 1), 0) AS avaliacao,
+             COUNT(av.id_avaliacao) AS avaliacoes
+      FROM anuncios an
+      INNER JOIN usuarios u ON u.id_usuario = an.id_usuario
+      INNER JOIN categorias c ON c.id_categoria = an.id_categoria
+      LEFT JOIN avaliacoes av ON av.id_anuncio = an.id_anuncio
+      WHERE an.id_anuncio = ?
+      GROUP BY an.id_anuncio
+    `, [id]);
+  } catch (erro) {
+    if (!colunaFotosAusente(erro)) throw erro;
+    [rows] = await pool.query(`
+      SELECT an.id_anuncio AS id,
+             an.id_usuario AS usuarioId,
+             an.id_categoria AS categoriaId,
+             an.titulo, an.descricao, an.preco, an.cidade, an.estado, an.ativo,
+             an.latitude,
+             an.longitude,
+             c.nome AS categoria,
+             u.nome AS nome, u.telefone, u.bairro, u.sobre, u.foto,
+             COALESCE(ROUND(AVG(av.nota), 1), 0) AS avaliacao,
+             COUNT(av.id_avaliacao) AS avaliacoes
+      FROM anuncios an
+      INNER JOIN usuarios u ON u.id_usuario = an.id_usuario
+      INNER JOIN categorias c ON c.id_categoria = an.id_categoria
+      LEFT JOIN avaliacoes av ON av.id_anuncio = an.id_anuncio
+      WHERE an.id_anuncio = ?
+      GROUP BY an.id_anuncio
+    `, [id]);
+  }
+  if (!rows[0]) return null;
+  const [item] = comCapa(mascarar(rows));
+  return item;
 }
 
 async function buscarTelefone(id) {
@@ -125,22 +207,53 @@ async function criar(usuarioId, dados) {
   const idCategoria = await categoriaId(dados.categoria);
   if (!idCategoria) throw new Error('Categoria não encontrada.');
   const local = validarLocalidade(dados.cidade, dados.estado);
-  const [result] = await pool.query(`
-    INSERT INTO anuncios (id_usuario, id_categoria, titulo, descricao, preco, cidade, estado, ativo)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-  `, [usuarioId, idCategoria, dados.titulo, dados.descricao, dados.preco, local.cidade, local.estado, dados.ativo]);
-  return buscarPorId(result.insertId);
+  const temCoords = Object.prototype.hasOwnProperty.call(dados, 'latitude') || Object.prototype.hasOwnProperty.call(dados, 'longitude');
+  const latitude = temCoords ? (dados.latitude ?? null) : null;
+  const longitude = temCoords ? (dados.longitude ?? null) : null;
+  try {
+    const [result] = await pool.query(`
+      INSERT INTO anuncios (id_usuario, id_categoria, titulo, descricao, preco, cidade, estado, ativo, latitude, longitude)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [usuarioId, idCategoria, dados.titulo, dados.descricao, dados.preco, local.cidade, local.estado, dados.ativo, latitude, longitude]);
+    return buscarPorId(result.insertId);
+  } catch (erro) {
+    if (!colunaFotosAusente(erro)) throw erro; // reaproveita detecção de coluna ausente
+    const [result] = await pool.query(`
+      INSERT INTO anuncios (id_usuario, id_categoria, titulo, descricao, preco, cidade, estado, ativo)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `, [usuarioId, idCategoria, dados.titulo, dados.descricao, dados.preco, local.cidade, local.estado, dados.ativo]);
+    return buscarPorId(result.insertId);
+  }
 }
 
 async function atualizar(id, usuarioId, dados) {
   const idCategoria = await categoriaId(dados.categoria);
   if (!idCategoria) throw new Error('Categoria não encontrada.');
   const local = validarLocalidade(dados.cidade, dados.estado);
-  const [result] = await pool.query(`
-    UPDATE anuncios
-    SET id_categoria = ?, titulo = ?, descricao = ?, preco = ?, cidade = ?, estado = ?, ativo = ?
-    WHERE id_anuncio = ? AND id_usuario = ?
-  `, [idCategoria, dados.titulo, dados.descricao, dados.preco, local.cidade, local.estado, dados.ativo, id, usuarioId]);
+  const temCoords = Object.prototype.hasOwnProperty.call(dados, 'latitude') || Object.prototype.hasOwnProperty.call(dados, 'longitude');
+  const latitude = temCoords ? (dados.latitude ?? null) : undefined;
+  const longitude = temCoords ? (dados.longitude ?? null) : undefined;
+  let result;
+  if (temCoords) {
+    try {
+      [result] = await pool.query(`
+        UPDATE anuncios
+        SET id_categoria = ?, titulo = ?, descricao = ?, preco = ?, cidade = ?, estado = ?, ativo = ?, latitude = ?, longitude = ?
+        WHERE id_anuncio = ? AND id_usuario = ?
+      `, [idCategoria, dados.titulo, dados.descricao, dados.preco, local.cidade, local.estado, dados.ativo, latitude, longitude, id, usuarioId]);
+    } catch (erro) {
+      if (!colunaFotosAusente(erro)) throw erro;
+      [result] = await pool.query(`
+        UPDATE anuncios SET id_categoria = ?, titulo = ?, descricao = ?, preco = ?, cidade = ?, estado = ?, ativo = ?
+        WHERE id_anuncio = ? AND id_usuario = ?
+      `, [idCategoria, dados.titulo, dados.descricao, dados.preco, local.cidade, local.estado, dados.ativo, id, usuarioId]);
+    }
+  } else {
+    [result] = await pool.query(`
+      UPDATE anuncios SET id_categoria = ?, titulo = ?, descricao = ?, preco = ?, cidade = ?, estado = ?, ativo = ?
+      WHERE id_anuncio = ? AND id_usuario = ?
+    `, [idCategoria, dados.titulo, dados.descricao, dados.preco, local.cidade, local.estado, dados.ativo, id, usuarioId]);
+  }
   if (!result.affectedRows) throw new Error('Este serviço não está disponível para edição.');
   return buscarPorId(id);
 }
@@ -153,4 +266,12 @@ async function excluir(id, usuarioId) {
   if (!result.affectedRows) throw new Error('Este serviço não está disponível para exclusão.');
 }
 
-module.exports = { listar, buscarPorId, criar, atualizar, excluir, buscarTelefone, buscarFotos };
+async function atualizarFotos(id, usuarioId, fotosJson) {
+  const [result] = await pool.query(
+    'UPDATE anuncios SET fotos = ? WHERE id_anuncio = ? AND id_usuario = ?',
+    [fotosJson, id, usuarioId]
+  );
+  if (!result.affectedRows) throw new Error('Este serviço não está disponível para edição.');
+}
+
+module.exports = { listar, buscarPorId, criar, atualizar, excluir, buscarTelefone, buscarFotos, atualizarFotos };

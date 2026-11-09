@@ -35,6 +35,13 @@
     <textarea name="descricao" required minlength="10" maxlength="600" rows="4"
       placeholder="Descreva os cuidados que você oferece e o que está incluído no serviço."></textarea>
   </label>
+  <div class="campo-inteiro campo-fotos-servico">
+    <label for="fotos-servico">Fotos do serviço
+      <input id="fotos-servico" name="fotos" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple aria-describedby="ajuda-fotos-servico">
+    </label>
+    <small class="ajuda" id="ajuda-fotos-servico">Até 6 imagens (JPG, PNG, WEBP ou GIF), máximo de 2 MB cada. A primeira imagem será a capa do anúncio.</small>
+    <div class="grade-fotos-preview" id="preview-fotos-servico" aria-live="polite"></div>
+  </div>
   <label class="campo-inteiro opcao-check opcao-publicar"><input name="ativo" type="checkbox" checked> Publicar este
     serviço no dashboard</label>
   <p class="erro-form campo-inteiro" id="erro-servico" role="alert" hidden></p>

@@ -13,6 +13,13 @@
   };
   for (const campo in campos) document.getElementById('publico-' + campo).textContent = campos[campo];
   HerbWay.aplicarAvatar(document.getElementById('publico-avatar'), usuario);
+  if (window.HerbWayMapa) HerbWayMapa.renderizarMapaAproximado('mapa-publico', usuario.latitude, usuario.longitude, 'mapa-publico-indisponivel');
+  const proprio = String(HerbWay.conta()?.id) === String(usuario.id);
+  const btnVis = document.querySelector('#btn-visualizacoes-perfil-publico');
+  if (btnVis) {
+    btnVis.hidden = !proprio;
+    btnVis.addEventListener('click', () => window.HerbWayVisualizacoes?.abrir('modal-visualizacoes-perfil-publico', 'perfil', usuario.id));
+  }
   mostrarCatalogo(HerbWay.ler().servicos.filter(servico => String(servico.usuarioId) === String(usuario.id) && servico.ativo));
   document.querySelector('#semResultados').textContent = 'Este perfil ainda não tem serviços publicados.';
 })();

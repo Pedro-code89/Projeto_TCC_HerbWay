@@ -153,3 +153,38 @@
   .modal-acoes { flex-direction: column-reverse; }
   .modal-acoes .botao { width: 100%; }
 }
+
+/* Fotos do serviço (formulário) */
+.campo-fotos-servico { display: grid; gap: 8px; }
+.grade-fotos-preview { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; margin-top: 4px; }
+.grade-fotos-preview:empty { display: none; }
+.foto-preview-item { position: relative; border-radius: 12px; overflow: hidden; border: 1px solid var(--borda); background: var(--superficie-2); aspect-ratio: 1 / 1; }
+.foto-preview-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.foto-preview-remover { position: absolute; top: 6px; right: 6px; width: 30px; height: 30px; min-height: 30px; padding: 0; border: 0; border-radius: 999px; background: rgba(0,0,0,.55); color: #fff; font-size: 18px; line-height: 1; display: grid; place-items: center; cursor: pointer; }
+.foto-preview-remover:hover { background: rgba(160,30,30,.85); }
+.foto-preview-capa { position: absolute; left: 6px; bottom: 6px; padding: 2px 8px; border-radius: 999px; background: var(--verde); color: #fff; font-size: 11px; font-weight: 700; }
+
+/* Localização aproximada (Leaflet) */
+.mapa-aproximado { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--borda); }
+.mapa-aproximado h3 { font-size: 16px; margin-bottom: 10px; }
+.mapa-aproximado .mapa-canvas { width: 100%; height: 280px; border-radius: 12px; border: 1px solid var(--borda); overflow: hidden; background: var(--superficie-2); }
+.mapa-aproximado .leaflet-container { font-family: inherit; background: var(--superficie-2); }
+.mapa-aproximado .leaflet-control-attribution { background: rgba(20, 30, 24, 0.72); color: #d7e3dc; }
+.mapa-aproximado .leaflet-control-attribution a { color: #9ae6b4; }
+@media (max-width: 700px) { .mapa-aproximado .mapa-canvas { height: 220px; } }
+
+/* Visualizações (proprietário) */
+.perfil-acoes-topo { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.botao-visualizacoes { color: var(--verde-texto); background: var(--vidro); border: 1px solid var(--borda); }
+.botao-visualizacoes:hover { background: var(--hover-claro); }
+.visualizacoes-painel { display: grid; gap: 14px; }
+.visualizacoes-periodos { display: flex; flex-wrap: wrap; gap: 8px; }
+.visualizacoes-periodos .botao { min-height: 40px; padding: 8px 14px; font-size: 14px; }
+.visualizacoes-periodos .botao.ativa { background: var(--verde); color: #fff; border-color: var(--verde); }
+.visualizacoes-resumo { font-size: 15px; }
+.visualizacoes-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; max-height: min(50vh, 360px); overflow: auto; }
+.visualizacao-visitante { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid var(--borda); border-radius: 12px; background: var(--superficie-2); }
+.visualizacao-avatar { width: 42px; height: 42px; font-size: 14px; text-decoration: none; display: inline-grid; place-items: center; overflow: hidden; }
+.visualizacao-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.visualizacao-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.visualizacao-info .texto-cinza { font-size: 13px; }

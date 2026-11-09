@@ -9,15 +9,17 @@ const servicoRoutes = require('./src/Routes/servicoRoutes');
 const contratacaoRoutes = require('./src/Routes/contratacaoRoutes');
 const apiRoutes = require('./src/Routes/apiRoutes');
 const localidadeRoutes = require('./src/Routes/localidadeRoutes');
+const visualizacaoRoutes = require('./src/Routes/visualizacaoRoutes');
 
 const app = express();
 const port = 3000;
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'src', 'Views'));
+app.use('/vendor/leaflet', express.static(path.join(__dirname, 'node_modules', 'leaflet', 'dist')));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.urlencoded({ extended: true, limit: '12mb' }));
-app.use(express.json({ limit: '12mb' }));
+app.use(express.urlencoded({ extended: true, limit: '25mb' }));
+app.use(express.json({ limit: '25mb' }));
 app.use(session({
   secret: process.env.SESSION_SECRET || 'herbway-segredo-tcc',
   resave: false,
@@ -31,6 +33,7 @@ app.use(servicoRoutes);
 app.use(contratacaoRoutes);
 app.use(apiRoutes);
 app.use(localidadeRoutes);
+app.use(visualizacaoRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err);

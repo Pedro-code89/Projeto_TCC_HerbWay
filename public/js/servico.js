@@ -11,11 +11,17 @@
   document.querySelector('#profissional-local').textContent = `${servicoAtual.cidade}, ${servicoAtual.estado}`;
   document.querySelector('#profissional-avaliacao').textContent = HerbWay.avaliacao(servicoAtual);
   document.querySelector('#ver-profissional').href = '/profissional/' + encodeURIComponent(servicoAtual.usuarioId);
-  const proprio = HerbWay.conta()?.id === servicoAtual.usuarioId;
+  if (window.HerbWayMapa) HerbWayMapa.renderizarMapaAproximado('mapa-servico', servicoAtual.latitude, servicoAtual.longitude, 'mapa-servico-indisponivel');
+  const proprio = String(HerbWay.conta()?.id) === String(servicoAtual.usuarioId);
   document.querySelector('#registrar-contratacao').hidden = proprio;
   document.querySelector('#ajuda-contratacao').hidden = proprio;
   document.querySelector('#editar-anuncio').hidden = !proprio;
   document.querySelector('#editar-anuncio').href = '/perfil?editar=' + encodeURIComponent(servicoAtual.id);
+  const btnVis = document.querySelector('#btn-visualizacoes-servico');
+  if (btnVis) {
+    btnVis.hidden = !proprio;
+    btnVis.addEventListener('click', () => window.HerbWayVisualizacoes?.abrir('modal-visualizacoes-servico', 'servico', servicoAtual.id));
+  }
 
   // Telefone: exibe a versão mascarada; desbloqueio exige login e busca o número real na API.
   const telefoneExibicao = document.querySelector('#telefone-exibicao');
@@ -43,24 +49,67 @@
     catch { mostrarAviso('Não foi possível copiar.'); }
   });
 
-  // Fotos do serviço: carrega da API e exibe na grade, ou mostra "Sem fotos".
+  // Fotos do serviço: carrega da API e exibe na grade, com visualização ampliada.
   const secaoFotos = document.querySelector('#fotos-servico');
   const listaFotos = document.querySelector('#lista-fotos');
   const avisoSemFotos = document.querySelector('#sem-fotos');
+  const modalFoto = document.querySelector('#modal-foto');
+  const fotoAmpliada = document.querySelector('#foto-ampliada');
+  const fotoLegenda = document.querySelector('#foto-legenda');
+  const fotoContador = document.querySelector('#foto-contador');
+  const btnFotoAnterior = document.querySelector('#foto-anterior');
+  const btnFotoProxima = document.querySelector('#foto-proxima');
+  let fotosCarregadas = [];
+  let indiceFoto = 0;
+
+  function mostrarFotoModal(indice) {
+    if (!fotosCarregadas.length) return;
+    indiceFoto = (indice + fotosCarregadas.length) % fotosCarregadas.length;
+    const foto = fotosCarregadas[indiceFoto];
+    fotoAmpliada.src = foto.url;
+    fotoAmpliada.alt = foto.legenda || `Foto ${indiceFoto + 1} do serviço`;
+    fotoLegenda.textContent = foto.legenda || '';
+    fotoLegenda.hidden = !foto.legenda;
+    fotoContador.textContent = fotosCarregadas.length > 1 ? `${indiceFoto + 1} / ${fotosCarregadas.length}` : '';
+    const varios = fotosCarregadas.length > 1;
+    btnFotoAnterior.hidden = !varios;
+    btnFotoProxima.hidden = !varios;
+  }
+
+  function abrirFoto(indice) {
+    mostrarFotoModal(indice);
+    if (modalFoto && typeof modalFoto.showModal === 'function') modalFoto.showModal();
+  }
+
+  btnFotoAnterior?.addEventListener('click', () => mostrarFotoModal(indiceFoto - 1));
+  btnFotoProxima?.addEventListener('click', () => mostrarFotoModal(indiceFoto + 1));
+  modalFoto?.addEventListener('click', e => { if (e.target === modalFoto) modalFoto.close(); });
+  document.addEventListener('keydown', e => {
+    if (!modalFoto || !modalFoto.open) return;
+    if (e.key === 'ArrowLeft') { e.preventDefault(); mostrarFotoModal(indiceFoto - 1); }
+    if (e.key === 'ArrowRight') { e.preventDefault(); mostrarFotoModal(indiceFoto + 1); }
+  });
 
   async function carregarFotos() {
     try {
       const resposta = await fetch('/api/servicos/' + encodeURIComponent(servicoAtual.id) + '/fotos');
       const fotos = await resposta.json().catch(() => []);
-      if (fotos && fotos.length > 0) {
+      fotosCarregadas = Array.isArray(fotos) ? fotos.filter(f => f && f.url) : [];
+      if (fotosCarregadas.length > 0) {
         secaoFotos.hidden = false;
         avisoSemFotos.hidden = true;
         listaFotos.hidden = false;
-        fotos.forEach(foto => {
+        listaFotos.replaceChildren();
+        fotosCarregadas.forEach((foto, indice) => {
           const img = document.createElement('img');
           img.src = foto.url;
-          img.alt = foto.legenda || 'Foto do serviço';
+          img.alt = foto.legenda || `Foto ${indice + 1} do serviço`;
           img.loading = 'lazy';
+          img.tabIndex = 0;
+          img.role = 'button';
+          img.className = 'foto-servico-item';
+          img.addEventListener('click', () => abrirFoto(indice));
+          img.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); abrirFoto(indice); } });
           listaFotos.appendChild(img);
         });
       } else {

@@ -1,3 +1,4 @@
+-- latitude/longitude: localização aproximada (centro de bairro/região) para mapas. Migração: database-migration-mapas.sql
 CREATE TABLE usuarios (
     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
@@ -9,6 +10,8 @@ CREATE TABLE usuarios (
     bairro VARCHAR(100),
     sobre TEXT,
     foto MEDIUMTEXT,
+    latitude DECIMAL(10,8) NULL,
+    longitude DECIMAL(11,8) NULL,
     email_verificado TINYINT(1) NOT NULL DEFAULT 0
 );
 
@@ -18,6 +21,9 @@ CREATE TABLE categorias (
     imagem VARCHAR(255)
 );
 
+-- fotos: referências das imagens do anúncio (JSON com array de caminhos/URLs), usado pela galeria.
+-- latitude/longitude: localização aproximada (centro de bairro/região). Migração: database-migration-mapas.sql
+-- Bancos existentes: ALTER TABLE anuncios ADD COLUMN fotos TEXT NULL;
 CREATE TABLE anuncios (
     id_anuncio INT AUTO_INCREMENT PRIMARY KEY,
     id_usuario INT NOT NULL,
@@ -28,6 +34,9 @@ CREATE TABLE anuncios (
     cidade VARCHAR(100) NOT NULL,
     estado CHAR(2) NOT NULL,
     ativo BOOLEAN DEFAULT TRUE,
+    fotos MEDIUMTEXT DEFAULT NULL,
+    latitude DECIMAL(10,8) NULL,
+    longitude DECIMAL(11,8) NULL,
 
     CONSTRAINT fk_anuncio_usuario
         FOREIGN KEY (id_usuario)
@@ -112,4 +121,20 @@ CREATE TABLE avaliacoes (
 
     CONSTRAINT chk_nota
         CHECK (nota BETWEEN 1 AND 5)
+);
+
+-- visualizacoes: contagem de acessos a perfis e serviços (migração: database-migration-visualizacoes.sql)
+CREATE TABLE IF NOT EXISTS visualizacoes (
+    id_visualizacao INT AUTO_INCREMENT PRIMARY KEY,
+    tipo ENUM('perfil', 'servico') NOT NULL,
+    id_usuario_alvo INT NULL,
+    id_servico_alvo INT NULL,
+    id_visualizador INT NULL,
+    sessao_id VARCHAR(128) NULL,
+    visto_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_vis_usuario_alvo FOREIGN KEY (id_usuario_alvo) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
+    CONSTRAINT fk_vis_servico_alvo FOREIGN KEY (id_servico_alvo) REFERENCES anuncios(id_anuncio) ON DELETE CASCADE,
+    CONSTRAINT fk_vis_visualizador FOREIGN KEY (id_visualizador) REFERENCES usuarios(id_usuario) ON DELETE SET NULL,
+    INDEX idx_vis_perfil (tipo, id_usuario_alvo, visto_em),
+    INDEX idx_vis_servico (tipo, id_servico_alvo, visto_em)
 );

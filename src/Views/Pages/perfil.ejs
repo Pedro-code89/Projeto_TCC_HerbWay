@@ -2,7 +2,7 @@
   <!DOCTYPE html>
   <html lang="pt-BR">
   <%- include('../Components/head', { titulo: idPerfil ? 'Perfil' : 'Meu perfil' , estilos: ['perfil.css'], scripts:
-    ['localidade.js', 'perfil.js'] }) %>
+    ['localidade.js', 'mapa.js', 'perfil.js'], leaflet: true }) %>
 
     <body data-perfil-id="<%= idPerfil %>">
       <%- include('../Components/cabecalho') %>
@@ -36,12 +36,14 @@
                   </p>
                 </div>
               </div>
-              <button class="botao botao-contorno" id="editar-perfil" type="button" data-proprio hidden>
-                <svg class="icone" aria-hidden="true">
-                  <use href="#icone-editar"></use>
-                </svg>
-                Editar perfil
-              </button>
+              <div class="perfil-acoes-topo" data-proprio hidden>
+                <button class="botao-icone botao-visualizacoes" id="btn-visualizacoes-perfil" type="button" aria-label="Ver visualizações do perfil"><svg class="icone" aria-hidden="true"><use href="#icone-olho"></use></svg></button>
+                <button class="botao botao-contorno" id="editar-perfil" type="button">
+                  <svg class="icone" aria-hidden="true"><use href="#icone-editar"></use>
+                  </svg>
+                  Editar perfil
+                </button>
+              </div>
             </div>
 
             <dl class="dados-perfil" data-proprio hidden>
@@ -77,6 +79,11 @@
             <div class="sobre-publico" id="sobre-publico" hidden>
               <h3>Sobre</h3>
               <p id="descricao-publica"></p>
+            </div>
+            <div class="mapa-aproximado mapa-perfil" aria-labelledby="titulo-mapa-perfil">
+              <h3 id="titulo-mapa-perfil">Localização aproximada</h3>
+              <p class="texto-cinza" id="mapa-perfil-indisponivel" hidden>A localização aproximada não está disponível.</p>
+              <div id="mapa-perfil" class="mapa-canvas" hidden></div>
             </div>
           </section>
 
@@ -324,6 +331,19 @@
           </article>
         </template>
 
+        <dialog id="modal-visualizacoes-perfil" aria-labelledby="titulo-vis-perfil">
+          <div class="modal-topo"><h2 id="titulo-vis-perfil">Visualizações do perfil</h2><button class="botao-icone" type="button" data-fechar aria-label="Fechar"><svg class="icone" aria-hidden="true"><use href="#icone-fechar"></use></svg></button></div>
+          <div class="visualizacoes-painel">
+            <div class="visualizacoes-periodos" role="group" aria-label="Período">
+              <button type="button" class="botao botao-contorno ativa" data-periodo-vis="total" aria-pressed="true">Total</button>
+              <button type="button" class="botao botao-contorno" data-periodo-vis="30d" aria-pressed="false">30 dias</button>
+              <button type="button" class="botao botao-contorno" data-periodo-vis="7d" aria-pressed="false">7 dias</button>
+            </div>
+            <p class="visualizacoes-resumo"><strong data-vis-total>0</strong> visualizações · <strong data-vis-pessoas>0</strong> pessoas<span class="texto-cinza" data-vis-anonimos></span></p>
+            <p class="texto-cinza" data-vis-status hidden></p>
+            <ul class="visualizacoes-lista" data-vis-lista aria-label="Pessoas que visualizaram"></ul>
+          </div>
+        </dialog>
         <%- include('../Components/rodape') %>
     </body>
 
