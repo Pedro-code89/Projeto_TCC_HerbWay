@@ -35,11 +35,16 @@ window.HerbWay = (() => {
     pronto,
     ler: () => dados,
     conta: () => usuarioAtual,
+
     async entrar(email, senha) {
-      usuarioAtual = await requisicao('/login', { method: 'POST', body: JSON.stringify({ email, senha }) });
-      await carregar();
+      await requisicao('/login', {
+        method: 'POST',
+        body: JSON.stringify({ email, senha })
+      });
+      usuarioAtual = await requisicao('/api/me');
       return usuarioAtual;
     },
+
     async cadastrar(nome, email, senha) {
       return await requisicao('/cadastro', { method: 'POST', body: JSON.stringify({ nome, email, senha }) });
     },
@@ -71,12 +76,16 @@ window.HerbWay = (() => {
       window.dispatchEvent(new Event('herbway:atualizado'));
     },
     async avaliar(id, nota, comentario) {
-      await requisicao('/api/contratacoes/' + encodeURIComponent(id) + '/avaliar', { method: 'POST', body: JSON.stringify({ nota, comentario }) });
+      await requisicao('/api/contratacoes/' + encodeURIComponent(id) + '/avaliar', {
+        method: 'POST',
+        body: JSON.stringify({ nota, comentario })
+      });
       await carregar();
       window.dispatchEvent(new Event('herbway:atualizado'));
     },
     async sair() {
-      try { await requisicao('/api/logout', { method: 'POST' }); } finally { usuarioAtual = null; }
+      try { await requisicao('/api/logout', { method: 'POST' }); }
+      finally { usuarioAtual = null; }
     },
     estados: estadosHerbWay,
     aplicarAvatar: (elemento, usuario) => {
@@ -84,7 +93,8 @@ window.HerbWay = (() => {
       if (usuario.foto) {
         elemento.innerHTML = '';
         const img = document.createElement('img');
-        img.src = usuario.foto; img.alt = '';
+        img.src = usuario.foto;
+        img.alt = '';
         elemento.append(img);
       } else {
         elemento.textContent = usuario.nome.trim().split(/\s+/).slice(0, 2).map(parte => parte[0]).join('').toUpperCase();
