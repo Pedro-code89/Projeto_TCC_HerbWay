@@ -198,9 +198,12 @@ async function buscarFotos(id) {
 }
 
 async function categoriaId(nome) {
-  const nomeBanco = nome === 'Manutenção' ? 'Manutenção de Jardim' : nome;
-  const [rows] = await pool.query('SELECT id_categoria FROM categorias WHERE nome = ?', [nomeBanco]);
-  return rows[0]?.id_categoria || null;
+  const [rows] = await pool.query(
+    'SELECT id_categoria FROM categorias WHERE nome = ?',
+    [nome]
+  );
+
+  return rows[0]?.id_categoria ?? null;
 }
 
 async function criar(usuarioId, dados) {
