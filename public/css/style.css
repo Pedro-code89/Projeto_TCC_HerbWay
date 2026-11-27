@@ -35,8 +35,17 @@
 .nota { color: var(--nota-cor); font-size: 13px; }
 .card-anuncio h3 { font-size: 21px; line-height: 1.3; overflow-wrap: anywhere; }
 .card-anuncio h3 a:hover { color: var(--verde); text-decoration: underline; }
-.anuncio-descricao { margin-top: 12px; color: var(--cinza); font-size: 14px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 42px; }
-.anuncio-profissional { display: flex; align-items: center; gap: 12px; margin-top: 24px; padding-bottom: 20px; }
+.anuncio-descricao {
+  margin-top: 12px;
+  color: var(--cinza);
+  font-size: 14px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  min-height: 42px;
+}.anuncio-profissional { display: flex; align-items: center; gap: 12px; margin-top: 24px; padding-bottom: 20px; }
 .avatar-pequeno { display: grid; place-items: center; flex-shrink: 0; width: 46px; height: 46px; border-radius: 50%; background: var(--verde-claro); color: var(--verde-texto); font-weight: 700; }
 .anuncio-pessoa { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .anuncio-pessoa strong { font-size: 15px; overflow-wrap: anywhere; }
