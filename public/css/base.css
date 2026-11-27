@@ -245,8 +245,11 @@ select {
   background-repeat: no-repeat;
   background-position: right 8px center;
 }
-input:focus, select:focus, textarea:focus { outline: none; border-color: var(--verde); box-shadow: 0 0 0 3px rgb(67 137 116 / .22); }
-select option { background: var(--superficie); color: var(--texto); padding: 8px; }
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--verde);
+  box-shadow: none;
+}select option { background: var(--superficie); color: var(--texto); padding: 8px; }
 .pesquisa { border-radius: 18px; }
 .pesquisa:focus-within { outline: none; box-shadow: var(--vidro-sombra), 0 0 0 3px rgb(67 137 116 / .25); }
 

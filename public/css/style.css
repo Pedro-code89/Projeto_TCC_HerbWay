@@ -189,7 +189,7 @@
   .lista-fotos { grid-template-columns: 1fr; }
 }
 
-/* Visualizações (proprietário) */
+/* Visualizaï¿½ï¿½es (proprietï¿½rio) */
 .detalhe-topo-acoes { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
 .botao-visualizacoes { color: var(--verde-texto); background: var(--vidro); border: 1px solid var(--borda); }
 .botao-visualizacoes:hover { background: var(--hover-claro); }
@@ -203,3 +203,13 @@
 .visualizacao-avatar { width: 42px; height: 42px; font-size: 14px; text-decoration: none; }
 .visualizacao-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .visualizacao-info .texto-cinza { font-size: 13px; }
+
+.telefone-box,
+.telefone-acoes {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.telefone-acoes .botao {
+  padding-inline: 10px;
+  white-space: normal;
+}
